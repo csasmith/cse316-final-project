@@ -128,7 +128,7 @@ const Homescreen = (props) => {
 
 	const createNewList = async () => {
 		const length = todolists.length
-		const id = length >= 1 ? todolists[length - 1].id + Math.floor((Math.random() * 100) + 1) : 1;
+		const id = length >= 1 ? todolists[length - 1].id + Math.floor((Math.random() * 100) + 1) : 1; // just why?
 		let list = {
 			_id: '',
 			id: id,
@@ -146,7 +146,7 @@ const Homescreen = (props) => {
 		setActiveList({});
 	};
 
-	const updateListField = async (_id, field, value, prev) => {
+	const updateListField = async (_id, field, value, prev) => { // this takes care of 
 		let transaction = new UpdateListField_Transaction(_id, field, prev, value, UpdateTodolistField);
 		props.tps.addTransaction(transaction);
 		tpsRedo();
@@ -154,7 +154,7 @@ const Homescreen = (props) => {
 	};
 
 	const handleSetActive = (id) => {
-		const todo = todolists.find(todo => todo.id === id || todo._id === id);
+		const todo = todolists.find(todo => todo.id === id || todo._id === id); // why the _id?
 		setActiveList(todo);
 	};
 
@@ -234,15 +234,15 @@ const Homescreen = (props) => {
 			</WLMain>
 
 			{
-				showDelete && (<Delete deleteList={deleteList} activeid={activeList._id} setShowDelete={setShowDelete} />)
+				showDelete && (<Delete isVisible={showDelete} deleteList={deleteList} activeid={activeList._id} setShowDelete={setShowDelete} />)
 			}
 
 			{
-				showCreate && (<CreateAccount fetchUser={props.fetchUser} setShowCreate={setShowCreate} />)
+				showCreate && (<CreateAccount isVisible={showCreate} fetchUser={props.fetchUser} setShowCreate={setShowCreate} />)
 			}
 
 			{
-				showLogin && (<Login fetchUser={props.fetchUser} refetchTodos={refetch}setShowLogin={setShowLogin} />)
+				showLogin && (<Login isVisible={showLogin} fetchUser={props.fetchUser} refetchTodos={refetch}setShowLogin={setShowLogin} />)
 			}
 
 		</WLayout>
