@@ -13,7 +13,7 @@ const TableHeader = (props) => {
                 <WButton className='table-header-section' wType="texted" >Task</WButton>
             </WCol>
 
-            <WCol size="3">
+            <WCol size="2">
                 <WButton className='table-header-section' wType="texted">Due Date</WButton>
             </WCol>
 
@@ -21,7 +21,11 @@ const TableHeader = (props) => {
                 <WButton className='table-header-section' wType="texted" >Status</WButton>
             </WCol>
 
-            <WCol size="3">
+            <WCol size="2">
+                <WButton className='table-header-section' wType="texted" >Assigned To</WButton>
+            </WCol>
+
+            <WCol size="2">
                 <div className="table-header-buttons">
                     <WButton onClick={props.disabled ? clickDisabled : props.addItem} wType="texted" className={`${buttonStyle}`}>
                         <i className="material-icons">add_box</i>

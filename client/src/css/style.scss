@@ -61,6 +61,14 @@ html, body {
     color: $primary-color;
 }
 
+.black-assign {
+    background-color: var(--warm-black);
+}
+
+.red-assign {
+    background-color: rgba(128, 0, 0, 0.6);
+}
+
 .list-item-active {
     background-color: var(--deep-blue);
 }
