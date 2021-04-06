@@ -64,6 +64,14 @@ html, body {
 .list-item-active {
     background-color: var(--deep-blue);
 }
+.list-item-active > .list-text {
+    background-color: rgba(255, 200, 25, 0.4);
+}
+/* This just looks stupid
+.list-item-active > .list-text > .list-text-span {
+    background-color: rgba(255, 200, 25, 0.4);
+}
+*/
 
 .list-item {
     cursor: pointer;

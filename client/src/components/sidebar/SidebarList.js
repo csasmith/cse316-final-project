@@ -2,6 +2,7 @@ import React        from 'react';
 import SidebarEntry from './SidebarEntry';
 
 const SidebarList = (props) => {
+
     return (
         <>
             {
@@ -17,5 +18,7 @@ const SidebarList = (props) => {
         </>
     );
 };
+
+// filter out the todolist with activeid === id, then unshift it to todolists?
 
 export default SidebarList;
