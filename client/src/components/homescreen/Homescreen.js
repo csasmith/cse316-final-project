@@ -235,8 +235,18 @@ const Homescreen = (props) => {
 		return props.tps.hasTransactionToRedo();
 	}
 
+	const handleKeyDown = (event) => {
+		if (event.ctrlKey) {
+			if (event.keyCode === 90) {
+			  tpsUndo();
+			} else if (event.keyCode === 89) {
+			  tpsRedo();
+			}
+		}
+	}
+
 	return (
-		<WLayout wLayout="header-lside">
+		<WLayout onKeyDown={handleKeyDown} wLayout="header-lside">
 			<WLHeader>
 				<WNavbar color="colored">
 					<ul>
