@@ -227,6 +227,14 @@ const Homescreen = (props) => {
 		toggleShowDelete(!showDelete)
 	}
 
+	const canUndo = () => {
+		return props.tps.hasTransactionToUndo();
+	}
+
+	const canRedo = () => {
+		return props.tps.hasTransactionToRedo();
+	}
+
 	return (
 		<WLayout wLayout="header-lside">
 			<WLHeader>
@@ -272,6 +280,7 @@ const Homescreen = (props) => {
 									activeList={activeList} setActiveList={setActiveList}
 									sortColumn={sortColumn}
 									undo={tpsUndo} redo={tpsRedo}
+									canUndo={canUndo} canRedo={canRedo}
 								/>
 							</div>
 						:
