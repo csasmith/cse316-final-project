@@ -6,6 +6,8 @@ const TableEntry = (props) => {
 
     const completeStyle = data.completed ? ' complete-task' : ' incomplete-task';
     const assignStyle = data.completed ? ' black-assign' : ' red-assign';
+    const downStyle = (props.index === (props.length - 1)) ? 'general-disable' : '';
+    const upStyle = props.index ? '' : 'general-disable';
 
     const description = data.description;
     const due_date = data.due_date;
@@ -107,10 +109,10 @@ const TableEntry = (props) => {
 
             <WCol size="3">
                 <div className='button-group'>
-                    <WButton className="table-entry-buttons" onClick={() => props.reorderItem(data._id, -1)} wType="texted">
+                    <WButton className={`${upStyle} table-entry-buttons`} onClick={upStyle ? null : () => props.reorderItem(data._id, -1)} wType="texted">
                         <i className="material-icons">expand_less</i>
                     </WButton>
-                    <WButton className="table-entry-buttons" onClick={() => props.reorderItem(data._id, 1)} wType="texted">
+                    <WButton className={`${downStyle} table-entry-buttons`} onClick={downStyle ? null : () => props.reorderItem(data._id, 1)} wType="texted">
                         <i className="material-icons">expand_more</i>
                     </WButton>
                     <WButton className="table-entry-buttons" onClick={() => props.deleteItem(data, props.index)} wType="texted">

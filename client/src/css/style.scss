@@ -146,9 +146,9 @@ html, body {
     cursor: default;
 }
 
-.undo-redo-disable {
-    color: var(--warm-black);
-    cursor: default;
+.general-disable {
+    color: var(--warm-black) !important;
+    cursor: default !important;
 }
 
 .table-header {
