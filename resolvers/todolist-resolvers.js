@@ -116,7 +116,7 @@ module.exports = {
 		**/
 		updateItemField: async (_, args) => {
 			const { _id, itemId, field,  flag } = args;
-			let { value } = args
+			let { value } = args;
 			const listId = new ObjectId(_id);
 			const found = await Todolist.findOne({_id: listId});
 			let listItems = found.items;
@@ -164,6 +164,21 @@ module.exports = {
 			listItems = found.items;
 			return (found.items);
 
+		},
+		/**
+		 * @param {object} args contains list id, list of previous items in case of error, and list of new items to set
+		 * @returns {array}  
+		 */
+		setItems: async (_, args) => {
+			console.log("did we even get here?");
+			const { _id, newItems } = args;
+			const listID = new ObjectId(_id);
+			const found = await Todolist.findOne({_id: listID});
+			const prevItems = found.items;
+			const updated = await Todolist.updateOne({_id: listID}, { items: newItems });
+			if (updated) return (newItems);
+			// return prevItems if unsuccessful
+			return (prevItems);
 		}
 
 	}

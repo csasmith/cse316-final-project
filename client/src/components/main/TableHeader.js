@@ -9,24 +9,29 @@ const TableHeader = (props) => {
 
     return (
         <WRow className="table-header">
-            <WCol size="4">
-                <WButton className='table-header-section' wType="texted" >Task</WButton>
+            <WCol size="3">
+                <WButton className='table-header-section' onClick={props.disabled ? clickDisabled : () => props.sortColumn('description')} wType="texted" >Task</WButton>
+            </WCol>
+            <WCol size="2">
+                <WButton className='table-header-section' onClick={props.disabled ? clickDisabled : () => props.sortColumn('due_date')} wType="texted">Due Date</WButton>
             </WCol>
 
             <WCol size="2">
-                <WButton className='table-header-section' wType="texted">Due Date</WButton>
+                <WButton className='table-header-section' onClick={props.disabled ? clickDisabled : () => props.sortColumn('assigned_to')} wType="texted" >Status</WButton>
             </WCol>
 
             <WCol size="2">
-                <WButton className='table-header-section' wType="texted" >Status</WButton>
+                <WButton className='table-header-section' onClick={props.disabled ? clickDisabled : () => props.sortColumn('completed')} wType="texted" >Assigned To</WButton>
             </WCol>
 
-            <WCol size="2">
-                <WButton className='table-header-section' wType="texted" >Assigned To</WButton>
-            </WCol>
-
-            <WCol size="2">
+            <WCol size="3">
                 <div className="table-header-buttons">
+                    <WButton className={`${buttonStyle}`} onClick={props.disabled ? clickDisabled : props.undo} wType="texted" clickAnimation="ripple-light" shape="rounded">
+                        <i className="material-icons">undo</i>
+                    </WButton>
+                    <WButton className={`${buttonStyle}`} onClick={props.disabled ? clickDisabled : props.redo} wType="texted" clickAnimation="ripple-light" shape="rounded">
+                        <i className="material-icons">redo</i>
+                    </WButton>
                     <WButton onClick={props.disabled ? clickDisabled : props.addItem} wType="texted" className={`${buttonStyle}`}>
                         <i className="material-icons">add_box</i>
                     </WButton>

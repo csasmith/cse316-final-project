@@ -14,7 +14,8 @@ import { WLayout, WLHeader, WLMain, WLSide } from 'wt-frontend';
 import { UpdateListField_Transaction, 
 	UpdateListItems_Transaction, 
 	ReorderItems_Transaction, 
-	EditItem_Transaction } 				from '../../utils/jsTPS';
+	EditItem_Transaction, 
+	SortColumn_Transaction} 				from '../../utils/jsTPS';
 import WInput from 'wt-frontend/build/components/winput/WInput';
 
 
@@ -33,6 +34,7 @@ const Homescreen = (props) => {
 	const [DeleteTodoItem] 			= useMutation(mutations.DELETE_ITEM);
 	const [AddTodolist] 			= useMutation(mutations.ADD_TODOLIST);
 	const [AddTodoItem] 			= useMutation(mutations.ADD_ITEM);
+	const [SetItems]				= useMutation(mutations.SET_ITEMS);
 
 
 	const { loading, error, data, refetch } = useQuery(GET_DB_TODOS);
@@ -132,6 +134,7 @@ const Homescreen = (props) => {
 
 	};
 
+
 	const createNewList = async () => {
 		props.tps.clearAllTransactions();
 		const length = todolists.length
@@ -165,6 +168,55 @@ const Homescreen = (props) => {
 		tpsRedo();
 
 	};
+
+	/**
+	 * taken from https://stackoverflow.com/questions/52873741/apollo-boost-typename-in-query-prevent-new-mutation
+	 * The way I handle sorting column is by sorting the items here client-side (if necessary), and then updating
+	 * the Todolist in the database with this sorted list. However, items have a __typename property that doesn't play
+	 * well with mutations, so I just strip them here.
+	 */
+	const stripTypenames = (value) => {
+		if (Array.isArray(value)) {
+			return value.map(stripTypenames)
+		} else if (value !== null && typeof(value) === "object") {
+		  const newObject = {}
+		  for (const property in value) {
+			  if (property !== '__typename') {
+				newObject[property] = stripTypenames(value[property])
+			  }
+		  }
+		  return newObject
+		} else {
+		  return value
+		}
+	}
+
+	const sortColumn = async (col) => {
+		if (activeList._id) { // which should always be true when called anyway...
+			let prevItems = stripTypenames(JSON.parse(JSON.stringify(activeList.items)));
+			let newItems = stripTypenames(JSON.parse(JSON.stringify(activeList.items)));
+			
+			// check if items are sorted, reverse sorted, or unsorted
+			const isSorted = (arr, col, rev=false) => {
+				return !rev ? 
+					arr.every((item, index) => { // ascending
+						return index === 0 || item[col] >= arr[index - 1][col]
+					})
+					:
+					arr.every((item, index) => { // descending
+						return index === 0 || item[col] <= arr[index - 1][col]
+					});
+			}
+			if (isSorted(activeList.items, col) || isSorted(activeList.items, col, true)) {
+				newItems.reverse();
+			} else {
+				newItems.sort((a, b) => a[col].localeCompare(b[col]));
+			}
+			let transaction = new SortColumn_Transaction(activeList._id, prevItems, newItems, SetItems);
+			props.tps.addTransaction(transaction);
+			tpsRedo();
+		}
+    }
 
 	const handleSetActive = (id) => {
 		props.tps.clearAllTransactions();
@@ -239,6 +291,7 @@ const Homescreen = (props) => {
 									editItem={editItem} reorderItem={reorderItem}
 									setShowDelete={setShowDelete}
 									activeList={activeList} setActiveList={setActiveList}
+									sortColumn={sortColumn}
 									undo={tpsUndo} redo={tpsRedo}
 								/>
 							</div>
