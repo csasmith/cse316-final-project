@@ -236,6 +236,7 @@ const Homescreen = (props) => {
 	}
 
 	const handleKeyDown = (event) => {
+		console.log('hey');
 		if (event.ctrlKey) {
 			if (event.keyCode === 90) {
 			  tpsUndo();
@@ -246,7 +247,7 @@ const Homescreen = (props) => {
 	}
 
 	return (
-		<WLayout onKeyDown={handleKeyDown} wLayout="header-lside">
+		<WLayout tabIndex='0' onKeyDown={handleKeyDown} wLayout="header-lside">
 			<WLHeader>
 				<WNavbar color="colored">
 					<ul>
