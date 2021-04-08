@@ -168,7 +168,7 @@ const Homescreen = (props) => {
 		tpsRedo();
 
 	};
-	
+
 
 	const sortColumn = async (col) => {
 		if (activeList._id) { // which should always be true when called anyway...
@@ -179,17 +179,17 @@ const Homescreen = (props) => {
 			const isSorted = (arr, col, rev=false) => {
 				return !rev ? 
 					arr.every((item, index) => { // ascending
-						return index === 0 || item[col] >= arr[index - 1][col]
+						return index === 0 || item[col].toString().localeCompare(arr[index - 1][col].toString()) >= 0
 					})
 					:
 					arr.every((item, index) => { // descending
-						return index === 0 || item[col] <= arr[index - 1][col]
+						return index === 0 || item[col].toString().localeCompare(arr[index - 1][col].toString()) <= 0
 					});
 			}
 			if (isSorted(activeList.items, col) || isSorted(activeList.items, col, true)) {
 				newItems.reverse();
 			} else {
-				newItems.sort((a, b) => a[col].localeCompare(b[col]));
+				newItems.sort((a, b) => a[col].toString().localeCompare(b[col].toString()));
 			}
 			let transaction = new SortColumn_Transaction(activeList._id, prevItems, newItems, SetItems);
 			props.tps.addTransaction(transaction);

@@ -17,11 +17,11 @@ const TableHeader = (props) => {
             </WCol>
 
             <WCol size="2">
-                <WButton className='table-header-section' onClick={props.disabled ? clickDisabled : () => props.sortColumn('assigned_to')} wType="texted" >Status</WButton>
+                <WButton className='table-header-section' onClick={props.disabled ? clickDisabled : () => props.sortColumn('completed')} wType="texted" >Status</WButton>
             </WCol>
 
             <WCol size="2">
-                <WButton className='table-header-section' onClick={props.disabled ? clickDisabled : () => props.sortColumn('completed')} wType="texted" >Assigned To</WButton>
+                <WButton className='table-header-section' onClick={props.disabled ? clickDisabled : () => props.sortColumn('assigned_to')} wType="texted" >Assigned To</WButton>
             </WCol>
 
             <WCol size="3">
