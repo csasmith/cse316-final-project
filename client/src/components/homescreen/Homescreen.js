@@ -199,7 +199,7 @@ const Homescreen = (props) => {
 
 	const handleSetActive = (id) => {
 		props.tps.clearAllTransactions();
-		const todo = todolists.find(todo => todo.id === id || todo._id === id); // why the _id?
+		const todo = todolists.find(todo => todo._id === id); // why the _id?
 		setActiveList(todo);
 	};
 
@@ -251,7 +251,7 @@ const Homescreen = (props) => {
 					{
 						activeList ?
 							<SidebarContents
-								todolists={todolists} activeid={activeList.id} auth={auth}
+								todolists={todolists} activeid={activeList._id} auth={auth}
 								handleSetActive={handleSetActive} createNewList={createNewList}
 								undo={tpsUndo} redo={tpsRedo}
 								updateListField={updateListField}

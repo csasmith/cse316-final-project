@@ -170,7 +170,6 @@ module.exports = {
 		 * @returns {array}  
 		 */
 		setItems: async (_, args) => {
-			console.log("did we even get here?");
 			const { _id, newItems } = args;
 			const listID = new ObjectId(_id);
 			const found = await Todolist.findOne({_id: listID});
