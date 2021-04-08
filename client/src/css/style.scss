@@ -109,6 +109,10 @@ html, body {
     color: $text-color;
 }
 
+.sidebar-header-add {
+    background-color: $primary-color;
+}
+
 .table-entries {
     scrollbar-width: thin;
 }
@@ -148,6 +152,7 @@ html, body {
 
 .general-disable {
     color: var(--warm-black) !important;
+    background-color: $background-color;
     cursor: default !important;
 }
 

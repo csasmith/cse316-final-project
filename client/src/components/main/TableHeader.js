@@ -28,13 +28,13 @@ const TableHeader = (props) => {
 
             <WCol size="3">
                 <div className="table-header-buttons">
-                    <WButton className={`${undoStyle} ${buttonStyle}`} onClick={props.disabled ? clickDisabled : props.undo} wType="texted" clickAnimation="ripple-light" shape="rounded">
+                    <WButton className={`${undoStyle} ${buttonStyle} table-header-adjust`} onClick={props.disabled ? clickDisabled : props.undo} wType="texted" clickAnimation="ripple-light" shape="rounded">
                         <i className="material-icons">undo</i>
                     </WButton>
-                    <WButton className={`${redoStyle} ${buttonStyle}`} onClick={props.disabled ? clickDisabled : props.redo} wType="texted" clickAnimation="ripple-light" shape="rounded">
+                    <WButton className={`${redoStyle} ${buttonStyle} table-header-adjust`} onClick={props.disabled ? clickDisabled : props.redo} wType="texted" clickAnimation="ripple-light" shape="rounded">
                         <i className="material-icons">redo</i>
                     </WButton>
-                    <WButton onClick={props.disabled ? clickDisabled : props.addItem} wType="texted" className={`${buttonStyle}`}>
+                    <WButton onClick={props.disabled ? clickDisabled : props.addItem} wType="texted" className={`${buttonStyle} table-header-adjust`}>
                         <i className="material-icons">add_box</i>
                     </WButton>
                     <WButton onClick={props.disabled ? clickDisabled : props.setShowDelete} wType="texted" className={`${buttonStyle}`}>
