@@ -168,33 +168,12 @@ const Homescreen = (props) => {
 		tpsRedo();
 
 	};
-
-	/**
-	 * taken from https://stackoverflow.com/questions/52873741/apollo-boost-typename-in-query-prevent-new-mutation
-	 * The way I handle sorting column is by sorting the items here client-side (if necessary), and then updating
-	 * the Todolist in the database with this sorted list. However, items have a __typename property that doesn't play
-	 * well with mutations, so I just strip them here.
-	 */
-	const stripTypenames = (value) => {
-		if (Array.isArray(value)) {
-			return value.map(stripTypenames)
-		} else if (value !== null && typeof(value) === "object") {
-		  const newObject = {}
-		  for (const property in value) {
-			  if (property !== '__typename') {
-				newObject[property] = stripTypenames(value[property])
-			  }
-		  }
-		  return newObject
-		} else {
-		  return value
-		}
-	}
+	
 
 	const sortColumn = async (col) => {
 		if (activeList._id) { // which should always be true when called anyway...
-			let prevItems = stripTypenames(JSON.parse(JSON.stringify(activeList.items)));
-			let newItems = stripTypenames(JSON.parse(JSON.stringify(activeList.items)));
+			let prevItems = JSON.parse(JSON.stringify(activeList.items));
+			let newItems = JSON.parse(JSON.stringify(activeList.items));
 			
 			// check if items are sorted, reverse sorted, or unsorted
 			const isSorted = (arr, col, rev=false) => {

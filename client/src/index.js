@@ -23,6 +23,7 @@ const cache = new InMemoryCache({
 			},
 		},
 	},
+	addTypename: false,
 });
 
 // bad hardcoding, localhost port should match port in the backend's .env file
@@ -32,7 +33,7 @@ const client = new ApolloClient({
 	uri: BACKEND_LOCATION,
 	// Credentials: include is necessary to pass along the auth cookies with each server request
 	credentials: 'include',
-	cache: cache,
+	cache: cache
 });
 
 
