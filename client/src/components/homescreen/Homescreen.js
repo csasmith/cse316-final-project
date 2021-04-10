@@ -26,6 +26,12 @@ const Homescreen = (props) => {
 	const [showDelete, toggleShowDelete] 	= useState(false);
 	const [showLogin, toggleShowLogin] 		= useState(false);
 	const [showCreate, toggleShowCreate] 	= useState(false);
+	const [tpsMutex, toggleMutex]			= useState(false);
+
+	// useEffect(() => {
+	// 	window.addEventListener('keydown', handleKeyDown);
+	// 	return () => {window.removeEventListener('keydown', handleKeyDown)};
+	// }, [props.tps])
 
 	const [ReorderTodoItems] 		= useMutation(mutations.REORDER_ITEMS);
 	const [UpdateTodoItemField] 	= useMutation(mutations.UPDATE_ITEM_FIELD);
@@ -63,15 +69,23 @@ const Homescreen = (props) => {
 	}
 
 	const tpsUndo = async () => {
-		const retVal = await props.tps.undoTransaction();
-		refetchTodos(refetch);
-		return retVal;
+		if (!tpsMutex) {
+			toggleMutex(true);
+			const retVal = await props.tps.undoTransaction();
+			refetchTodos(refetch);
+			toggleMutex(false);
+			return retVal;
+		}
 	}
 
 	const tpsRedo = async () => {
-		const retVal = await props.tps.doTransaction();
-		refetchTodos(refetch);
-		return retVal;
+		if (!tpsMutex) {
+			toggleMutex(true);
+			const retVal = await props.tps.doTransaction();
+			refetchTodos(refetch);
+			toggleMutex(false);
+			return retVal;
+		}
 	}
 
 
@@ -237,17 +251,19 @@ const Homescreen = (props) => {
 
 	const handleKeyDown = (event) => {
 		console.log('hey');
-		if (event.ctrlKey) {
-			if (event.keyCode === 90) {
-			  tpsUndo();
-			} else if (event.keyCode === 89) {
-			  tpsRedo();
+		// if (!event.repeat) {
+			if (event.ctrlKey) {
+				if (event.keyCode === 90) {
+				  tpsUndo();
+				} else if (event.keyCode === 89) {
+				  tpsRedo();
+				}
 			}
-		}
+		// }
 	}
 
 	return (
-		<WLayout tabIndex='0' onKeyDown={handleKeyDown} wLayout="header-lside">
+		<WLayout tabIndex='0' wLayout="header-lside" onKeyDown={handleKeyDown}>
 			<WLHeader>
 				<WNavbar color="colored">
 					<ul>
