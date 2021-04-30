@@ -13,9 +13,10 @@ const cache = new InMemoryCache({
 	*/
 	dataIdFromObject: object => `${object.__typename}:${object._id}`,
 	typePolicies: {
+		// hw3 soln has Todolist as another entry into typePolicies along with Query... what's that all about?
 		Query: {
 			fields: {
-				getAllEntries: {
+				getAllEntries: { // hw3 soln has this as getAllTodos, getAllEntries dne I think?
 					merge(existing, incoming){
 						return incoming
 					}
@@ -23,7 +24,7 @@ const cache = new InMemoryCache({
 			},
 		},
 	},
-	addTypename: false,
+	addTypename: false, // this is not in hw3 soln
 });
 
 // bad hardcoding, localhost port should match port in the backend's .env file
