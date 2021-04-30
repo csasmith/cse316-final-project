@@ -1,31 +1,62 @@
 import { gql } from "@apollo/client";
 
-export const GET_DB_USER = gql`
-	query GetDBUser {
+export const GET_USER = gql`
+	query GetCurrentUser {
 		getCurrentUser {
 			_id
-			firstName
-			lastName
-			email
+			name
 		}
 	}
 `;
 
-export const GET_DB_TODOS = gql`
-	query GetDBTodos {
-		getAllTodos {
+export const GET_MAPS = gql`
+	query GetAllMaps {
+		getAllMaps {
 			_id
-			id
 			name
 			owner
-			items {
+		}
+	}
+`;
+
+export const GET_MAP_BY_ID = gql`
+	query GetMapById($id: String!) {
+		getMapById(_id: $id) {
+			_id
+			name
+			owner
+			regions {
 				_id
-				id
-				description
-				due_date
-				assigned_to
-				completed
+				map
+				name
+				parent
+				capital
+				leader
+				landmarks
 			}
+		}
+	}
+`;
+
+export const GET_REGION_BY_ID = gql`
+	query GetRegionById($id: String!) {
+		getRegionById(_id: $id) {
+			_id
+			map
+			name
+			parent
+			subregions {
+				_id
+				map
+				name
+				parent
+				capital
+				leader
+				landmarks
+			}
+			capital
+			leader
+			landmarks
 		}
 	}
 `;

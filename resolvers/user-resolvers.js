@@ -43,7 +43,7 @@ module.exports = {
 			@returns {object} the user object or an object with an error message
 		**/
 		register: async (_, args, { res }) => {
-			const { email, password, firstName, lastName } = args;
+			const { name, email, password } = args;
 			const alreadyRegistered = await User.findOne({email: email});
 			if(alreadyRegistered) {
 				console.log('User with that email already registered.');
@@ -59,11 +59,9 @@ module.exports = {
 			const _id = new ObjectId();
 			const user = new User({
 				_id: _id,
-				firstName: firstName,
-				lastName: lastName,
+				name: name,
 				email: email, 
 				password: hashed,
-				initials: `${firstName[0]}.${lastName[0]}.`
 			})
 			const saved = await user.save();
 			// After registering the user, their tokens are generated here so they
@@ -73,6 +71,20 @@ module.exports = {
 			res.cookie('refresh-token', refreshToken, { httpOnly: true , sameSite: 'None', secure: true}); 
 			res.cookie('access-token', accessToken, { httpOnly: true , sameSite: 'None', secure: true}); 
 			return user;
+		},
+		/**
+		 * 
+		 * @param {*} args 
+		 * @param {*} param2 
+		 * @returns 
+		 */
+		update: async (_, args, { req, res }) => {
+			const { name, email, password } = args;
+			// find current user, then set new fields
+			const updated = await User.updateOne({ _id: req.userId }, { name : name, email: email, password: password });
+			if (!updated) { return {} }
+			console.log("Updated User: " + updated);
+			return updated;
 		},
 		/** 
 			@param 	 {object} res - response object containing the current access/refresh tokens  
