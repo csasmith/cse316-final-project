@@ -3,7 +3,7 @@ import Homescreen 		from './components/homescreen/Homescreen';
 import { useQuery } 	from '@apollo/client';
 import * as queries 	from './cache/queries';
 import { jsTPS } 		from './utils/jsTPS';
-import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
+import { BrowserRouter, Switch, Route, Redirect, Link } from 'react-router-dom';
  
 const App = () => {
 	let user = null;
@@ -17,9 +17,18 @@ const App = () => {
 		let { getCurrentUser } = data;
 		if(getCurrentUser !== null) { user = getCurrentUser; }
     }
+	let landingPath = user ? '/home' : '/welcome';
 
+	// consider hashrouter instead
 	return(
-		<BrowserRouter>
+		<div>
+			<input type='text' placeholder='Create Account'></input>
+		</div>
+	);
+}
+
+/*
+<BrowserRouter>
 			<Switch>
 				<Redirect exact from="/" to={ {pathname: "/home"} } />
 				<Route 
@@ -32,7 +41,6 @@ const App = () => {
 				<Route/>
 			</Switch>
 		</BrowserRouter>
-	);
-}
+*/
 
 export default App;
