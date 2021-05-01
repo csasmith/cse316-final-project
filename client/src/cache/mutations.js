@@ -49,31 +49,6 @@ export const LOGOUT = gql`
 
 /**
  * 
- * MAP MUTATIONS
- * 
- */
-
-// add_item in todolist had index field for undo...
-export const ADD_MAP = gql`
-	mutation AddMap($map: MapInput!) {
-		addMap(map: $map)
-	}
-`;
-
-export const DELETE_MAP = gql`
-	mutation DeleteMap($id: String!) {
-		deleteMap(_id: $id)
-	}
-`;
-
-export const SET_MAP_NAME = gql`
-	mutation SetMapName($id: String!, $name: String!) {
-		setMapName(_id: $id, name: $name)
-	}
-`;
-
-/**
- * 
  * REGION MUTATIONS
  * 
  */
@@ -84,27 +59,24 @@ export const ADD_SUBREGION = gql`
 	}
 `;
 
+// not sure how undo will work with this
 export const DELETE_SUBREGION = gql`
 	mutation DeleteSubregion($id: String!) {
-		deleteSubregion(_id: $id)
+		deleteSubregion(_id: $id) {
+			_id
+			parent
+		}
+	}
+`;
+
+export const CHANGE_SUBREGION_PARENT = gql`
+	mutation ChangeSubregionParent($subregion_id: String!, $newParent_id: String!) {
+		changeSubregionParent(subregion_id: $subregion_id, newParent_id: $newParent_id)
 	}
 `;
 
 export const SET_REGION_FIELD = gql`
 	mutation SetRegionField($id:String!, $field:String!, $val:String!) {
 		setRegionField(_id: $id, field: $field, val: $val)
-	}
-`;
-
-export const DELETE_ITEM = gql`
-	mutation DeleteItem($itemId: String!, $_id: String!) {
-		deleteItem(itemId: $itemId, _id: $_id) {
-			_id
-			id
-			description
-			due_date
-			assigned_to
-			completed
-		}
 	}
 `;

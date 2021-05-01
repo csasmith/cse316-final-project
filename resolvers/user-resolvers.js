@@ -78,7 +78,7 @@ module.exports = {
 		 * @param {*} param2 
 		 * @returns 
 		 */
-		update: async (_, args, { req, res }) => {
+		update: async (_, args, { req }) => {
 			const { name, email, password } = args;
 			// find current user, then set new fields
 			const updated = await User.updateOne({ _id: req.userId }, { name : name, email: email, password: password });

@@ -19,35 +19,16 @@ export const GET_MAPS = gql`
 	}
 `;
 
-export const GET_MAP_BY_ID = gql`
-	query GetMapById($id: String!) {
-		getMapById(_id: $id) {
-			_id
-			name
-			owner
-			regions {
-				_id
-				map
-				name
-				parent
-				capital
-				leader
-				landmarks
-			}
-		}
-	}
-`;
-
 export const GET_REGION_BY_ID = gql`
 	query GetRegionById($id: String!) {
 		getRegionById(_id: $id) {
 			_id
-			map
+			owner
 			name
 			parent
 			subregions {
 				_id
-				map
+				owner
 				name
 				parent
 				capital
@@ -58,5 +39,18 @@ export const GET_REGION_BY_ID = gql`
 			leader
 			landmarks
 		}
+	}
+`;
+
+// this seems like high trickery
+export const GET_CHILDREN_LANDMARKS = gql`
+	query GetChildrenLandmarks($id: String!) {
+		getChildrenLandmarks(_id: $id)
+	}
+`;
+
+export const GET_THIS_REGION_LANDMARKS = gql`
+	query GetThisRegionLandmarks($id: String) {
+		getThisRegionLandmarks(_id: $id)
 	}
 `;
