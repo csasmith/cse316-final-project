@@ -20,9 +20,9 @@
   },
   "homepage": "https://github.com/wolfie-VIP/CSE316-Spring21-HW3#readme",
   "dependencies": {
-    "@apollo/client": "^3.3.7",
-    "apollo-server": "^2.14.5",
-    "apollo-server-express": "^2.14.5",
+    "@apollo/client": "^3.3.16",
+    "apollo-server": "^2.24.0",
+    "apollo-server-express": "^2.24.0",
     "bcryptjs": "^2.4.3",
     "concurrently": "^5.3.0",
     "cookie-parser": "^1.4.5",
@@ -34,12 +34,12 @@
     "graphql-passport": "^0.6.3",
     "helmet": "^3.23.3",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.9.19",
+    "mongoose": "^5.12.7",
     "morgan": "^1.10.0",
-    "nodemon": "^2.0.4",
+    "nodemon": "^2.0.7",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
-    "validator": "^13.1.1",
+    "validator": "^13.6.0",
     "xss-clean": "^0.1.1"
   }
 }
