@@ -16,7 +16,6 @@ const CreateAccount = (props) => {
     const updateInput = (e) => {
         const { name, value } = e.target;
         const updated = { ...input, [name]: value }; // overwrites old [name] key/value pair
-        console.log(updated);
         setInput(updated);
     }
 
@@ -27,7 +26,7 @@ const CreateAccount = (props) => {
                 return
             }
         }
-        const {_, error, data } = await Register({ variables : { ...input } });
+        const { _, error, data } = await Register({ variables : { ...input } });
         if (error) { return `Error: ${error.message}`};
         if (data) {
             console.log(data);

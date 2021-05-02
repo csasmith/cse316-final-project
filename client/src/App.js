@@ -2,6 +2,7 @@ import React 			from 'react';
 import Welcome 			from './components/Welcome';
 import CreateAccount 	from './components/CreateAccount';
 import Login 			from './components/Login';
+import Home				from './components/Home';
 import { useQuery } 	from '@apollo/client';
 import * as queries 	from './cache/queries';
 import { jsTPS } 		from './utils/jsTPS';
@@ -42,9 +43,11 @@ const App = () => {
 					<CreateAccount fetchUser={refetch} />
 				</Route>
 				<Route path='/login'>
-					<Login />
+					<Login fetchUser={refetch} />
 				</Route>
-				<Route path='/home'></Route>
+				<Route path='/home'>
+					<Home fetchUser={refetch} user={user} />
+				</Route>
 				
 			</Switch>
 		</BrowserRouter>
