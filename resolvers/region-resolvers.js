@@ -7,7 +7,7 @@ module.exports = {
          * @param {*} req request object from context 
          * @returns 
          */
-        getAllMaps: async (_, _, { req }) => {
+        getAllMaps: async (_, __, { req }) => {
             const userId = new ObjectId(req.userId);
             if (!userId) return ({});
             const maps = await Region.find({ owner: userId, parent: "" });
@@ -23,7 +23,7 @@ module.exports = {
         }
     },
     Mutation: {
-        addSubRegion: async (_, args, { req }) => {
+        addSubregion: async (_, args, { req }) => {
             const { name, parent } = args;
             console.log("addSubRegion args: " + args);
             const objId = new ObjectId();
@@ -42,7 +42,7 @@ module.exports = {
             if (updated) return objId;
             return "Could not add new region";
         },
-        deleteSubRegion: async (_, args) => {
+        deleteSubregion: async (_, args) => {
             // Undo needs to return to original index!
             return 'delete subregion';
         },
