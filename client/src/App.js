@@ -1,5 +1,7 @@
 import React 			from 'react';
-import Homescreen 		from './components/homescreen/Homescreen';
+import Welcome 			from './components/Welcome';
+import CreateAccount 	from './components/CreateAccount';
+import Login 			from './components/Login';
 import { useQuery } 	from '@apollo/client';
 import * as queries 	from './cache/queries';
 import { jsTPS } 		from './utils/jsTPS';
@@ -9,7 +11,7 @@ const App = () => {
 	let user = null;
     let transactionStack = new jsTPS();
 	
-    const { loading, error, data, refetch } = useQuery(queries.GET_DB_USER);
+    const { loading, error, data, refetch } = useQuery(queries.GET_USER);
 
     if(error) { console.log(error); }
 	if(loading) { console.log(loading); }
@@ -17,13 +19,35 @@ const App = () => {
 		let { getCurrentUser } = data;
 		if(getCurrentUser !== null) { user = getCurrentUser; }
     }
-	let landingPath = user ? '/home' : '/welcome';
 
 	// consider hashrouter instead
+
+	// do something like App should render Welcome component, -- maybe redirect '/' to '/welcome'
+	// and then switch/routes to all different paths
+	// then those components (either in their file, or maybe this one?)
+	// check for auth and if no auth they redirect to '/'
+
+	// history seems nice bc ie when verifying login can history.push('/home')
+	// location nice bc we can save info for when we go back?
+	// almost definitely use useParams, might not even have to use location bc of this
+
 	return(
-		<div>
-			<input type='text' placeholder='Create Account'></input>
-		</div>
+		<BrowserRouter>
+			<Switch>
+				<Redirect exact from='/' to='/welcome' />
+				<Route path='/welcome'>
+					<Welcome />
+				</Route>
+				<Route path='/register'>
+					<CreateAccount fetchUser={refetch} />
+				</Route>
+				<Route path='/login'>
+					<Login />
+				</Route>
+				<Route path='/home'></Route>
+				
+			</Switch>
+		</BrowserRouter>
 	);
 }
 
