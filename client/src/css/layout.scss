@@ -36,7 +36,7 @@ html {
     padding-bottom: 20px;
 }
 
-.account-main {
+.main {
     height: 100%;
     display: flex;
     justify-content: center
@@ -82,4 +82,57 @@ html {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
+}
+
+.home-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content:center;
+    align-items: stretch;
+    width: 50%;
+}
+
+.home-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding-top: 2%;
+    padding-bottom: 2%;
+}
+
+.home-content {
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+}
+
+.home-maps {
+    width: 60%;
+}
+
+.home-side {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-content: center;
+    width: 40%;
+    
+}
+.home-side > * {
+    margin-top: 5%;
+}
+
+.create-map-btn {
+    align-self: stretch;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.modal-header {
+    text-align: center;
 }

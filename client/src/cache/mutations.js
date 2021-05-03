@@ -54,8 +54,8 @@ export const LOGOUT = gql`
  */
 
 export const ADD_SUBREGION = gql`
-	mutation AddSubRegion($subregion: RegionInput!) {
-		addSubRegion(subregion: $subregion)
+	mutation AddSubregion($subregion: RegionInput!) {
+		addSubregion(subregion: $subregion)
 	}
 `;
 

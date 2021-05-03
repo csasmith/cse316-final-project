@@ -4,11 +4,11 @@
     $navbar-background-color: black,//rgb(64, 69, 78),
     $sidebar-background-color: #2b2e36,//#353a44,
     $text-color: #e9edf0,
-    $modal-background: rgb(64, 69, 78),
+    $modal-background: rgb(55, 55, 55),
     $modal-section-padding: 24px,
     $modal-radius: 4px,
     $modal-border: 1px solid rgb(87, 93, 105),
-    $modal-button-color: rgba(255,255,255, 0.7),
+    $modal-button-color: #6e7478, // rgba(255,255,255, 0.7),
     $button-background-color: #6e7478,
     $modal-button-hover: #e9edf0,
     $button-text-color: white,
@@ -80,4 +80,27 @@ html, body {
 .account-content {
     background-color: black;
     color: white;
+}
+
+.home-header {
+    background-color: black;
+    color: white;
+    font-weight: bold;
+}
+
+.home-maps {
+    background-color:rgb(255, 170, 170);
+}
+
+.home-side {
+    background-color: red;
+}
+
+.create-map-btn {
+    font-weight: bold;
+}
+
+.modal-header {
+    color: white;
+    font-weight: bold;
 }
