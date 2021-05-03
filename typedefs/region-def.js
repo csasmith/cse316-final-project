@@ -8,11 +8,11 @@ const typeDefs = gql`
         _id: String!
         owner: String!
         name: String!
-        parent: String!
-        subregions: [Region]!
+        parent: String
+        subregions: [Region!]
         capital: String!
         leader: String!
-        landmarks: [String]!
+        landmarks: [String!]
     }
     extend type Query {
         getAllMaps: [Region]

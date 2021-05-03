@@ -24,8 +24,14 @@ module.exports = {
     },
     Mutation: {
         addSubregion: async (_, args, { req }) => {
-            const { name, parent } = args;
-            console.log("addSubRegion args: " + args);
+            const { subregion } = args;
+            const { name, parent } = subregion;
+            console.log("addSubregion name: " + name + ", parent: " + parent);
+            const existing = Region.findOne({name: name, parent: ""});
+            // this seems outside the spec...
+            if (existing) {
+                return "Error:Dup";
+            }
             const objId = new ObjectId();
             const newRegion = new Region({
                 _id: objId,
@@ -40,7 +46,7 @@ module.exports = {
             const updated = await newRegion.save();
             console.log("New region: " + updated);
             if (updated) return objId;
-            return "Could not add new region";
+            return "Error:DB";
         },
         deleteSubregion: async (_, args) => {
             // Undo needs to return to original index!
