@@ -10,7 +10,7 @@ import { BrowserRouter, Switch, Route, Redirect, Link } from 'react-router-dom';
  
 const App = () => {
 	let user = null;
-    let transactionStack = new jsTPS();
+    // let transactionStack = new jsTPS();
 	
     const { loading, error, data, refetch } = useQuery(queries.GET_USER);
 

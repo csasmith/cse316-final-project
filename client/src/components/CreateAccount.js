@@ -26,6 +26,7 @@ const CreateAccount = (props) => {
                 return
             }
         }
+        console.log({...input});
         const { _, error, data } = await Register({ variables : { ...input } });
         if (error) { return `Error: ${error.message}`};
         if (data) {
@@ -66,8 +67,8 @@ const CreateAccount = (props) => {
                     </ul>
                 </WNavbar>
             </WLHeader>
-            <WLMain className='account-main'>
-                <WLayout WLayout='header' className='account-container'>
+            <WLMain className='main'>
+                <WLayout className='account-container'>
                     <WLHeader className='account-header'>
                         <span className='account-title'>Create A New Account</span>
                         <WButton 

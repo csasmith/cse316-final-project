@@ -33,7 +33,6 @@ const Login = (props) => {
         }
         if (data) {
             const user = await props.fetchUser()
-            console.log('looks good to me...')
             history.push({ pathname: '/home', user: user});
         }
     }
@@ -63,7 +62,7 @@ const Login = (props) => {
                     </ul>
                 </WNavbar>
             </WLHeader>
-            <WLMain className='account-main'>
+            <WLMain className='main'>
                 <WLayout WLayout='header' className='account-container'>
                     <WLHeader className='account-header'>
                         <span className='account-title'>Login</span>
