@@ -1,18 +1,22 @@
 import React, { useState }      from 'react';
 import CreateMapModal           from './CreateMapModal';
 import { NavLink, Redirect,
-         useHistory }           from 'react-router-dom';
+         useHistory, Switch,
+         Route }                from 'react-router-dom';
 import { WLayout, WLHeader, 
          WLMain, WNavbar, 
          WNavItem, WButton, 
-         WLSide}                from 'wt-frontend';
+         WLSide, WRow, WCol}    from 'wt-frontend';
+import { GET_MAPS }             from '../cache/queries';
 import { LOGOUT, 
          ADD_SUBREGION }        from '../cache/mutations';
-import { useMutation, 
+import { useMutation,
+         useQuery, 
          useApolloClient }      from '@apollo/client';
 
 const Home = (props) => {
     
+    const [recentMapId, setRecentMapId] = useState("");
     const [Logout] = useMutation(LOGOUT);
     const [CreateMap] = useMutation(ADD_SUBREGION);
     const client = useApolloClient();
@@ -20,6 +24,34 @@ const Home = (props) => {
     const [deleteMapId, setDeleteMapId] = useState({});
     const [showCreate, toggleShowCreate] = useState(false);
     let history = useHistory();
+    let maps = [];
+
+    // will this be enough for maps to be there when we navigate home?
+    const { _, error, data, refetch } = useQuery(GET_MAPS);
+    if (error) {console.log(error.message)};
+    if (data) {
+        maps = data.getAllMaps;
+        if (recentMapId) { 
+            let recentMap = maps.find(map => map._id === recentMapId);
+            maps = maps.filter(map => map._id !== recentMapId);
+            maps.unshift(recentMap);
+        };
+        console.log(JSON.stringify(maps));
+    }
+
+    const selectMap = async (id) => {
+        const {_, error, data } = await refetch();
+        if (error) {console.log(error.message)};
+        if (data) {
+            maps = data.getAllMaps;
+            let selectedMap = maps.find(map => map._id === id);
+            if (!selectedMap) {console.log("selected map DNE, this will not go well...")};
+            maps = maps.filter(map => map._id !== recentMapId);
+            maps.unshift(selectedMap);
+        }
+        setRecentMapId(id);
+        history.push(`home/sheet/${id}`);
+    }
 
     const handleLogout = async (e) => {
         await Logout();
@@ -40,7 +72,7 @@ const Home = (props) => {
                 <WNavbar color='colored'>
                     <ul>
                         <WNavItem>
-                            <NavLink to="/" className='home-link'>
+                            <NavLink to="/home" className='home-link'>
                                 <h4>The World<br />Data Mapper</h4>
                             </NavLink>
                         </WNavItem>
@@ -62,10 +94,28 @@ const Home = (props) => {
                     <WLHeader className='home-header'>Your Maps</WLHeader>
                     <div className='home-content'>
                         <WLMain className='home-maps'>
-                            <ul>
-                                <li>The World</li>
-                                <li>Middle Earth</li>
-                            </ul>
+                        {
+                            maps.map((entry) => (
+                                <WRow className='map-entry'>
+                                    <WCol size='8' className='map-name'>
+                                        <WButton wType='texted'
+                                                 className='create-map-btn'
+                                                 hoverAnimation='lighten'
+                                                 onClick={() => selectMap(entry._id)}
+                                        >
+                                            {entry.name}
+                                        </WButton>
+                                    </WCol>
+                                    <WCol size='4' className='map-trash'>
+                                        <WButton wType='texted'
+                                                 hoverAnimation='darken'
+                                        >
+                                            <i className='material-icons small'>delete</i>
+                                        </WButton>
+                                    </WCol>
+                                </WRow>
+                            ))
+                        }
                         </WLMain>
                         <WLSide className='home-side'>
                             <img src='/globe.jpg' alt='globe' width='180' height='180'></img>
@@ -90,14 +140,8 @@ const Home = (props) => {
                                 isVisible={showCreate} 
                                 toggleShowCreate={toggleShowCreate} 
                                 createMap={CreateMap}
-                                history={history}/>)
+                                selectMap={selectMap} />)
             }
-
-            <Switch>
-                <Route path='/home/sheet/:id'>
-                    <RegionSpreadsheet fetchUser={props.fetchUser} user={props.user} />
-                </Route>
-            </Switch>
 
         </WLayout>
         : 

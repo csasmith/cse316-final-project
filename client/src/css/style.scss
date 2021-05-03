@@ -90,6 +90,7 @@ html, body {
 
 .home-maps {
     background-color:rgb(255, 170, 170);
+    scrollbar-width: thin;
 }
 
 .home-side {
@@ -97,6 +98,34 @@ html, body {
 }
 
 .create-map-btn {
+    font-weight: bold;
+}
+
+.add-region-btn {
+    color: lightgreen;
+}
+.sheet-undo {
+    color: white;
+}
+.sheet-redo {
+    color: white;
+}
+.main-region-name-link {
+    color: #0645AD !important;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.table-header {
+    background-color: red;
+    color: white;
+}
+
+.table-header-btn {
+    color: white;
+}
+
+.table-header-col {
     font-weight: bold;
 }
 

@@ -27,11 +27,6 @@ module.exports = {
             const { subregion } = args;
             const { name, parent } = subregion;
             console.log("addSubregion name: " + name + ", parent: " + parent);
-            const existing = Region.findOne({name: name, parent: ""});
-            // this seems outside the spec...
-            if (existing) {
-                return "Error:Dup";
-            }
             const objId = new ObjectId();
             const newRegion = new Region({
                 _id: objId,
@@ -45,6 +40,16 @@ module.exports = {
             });
             const updated = await newRegion.save();
             console.log("New region: " + updated);
+            // now add newRegion to parent if parent exists
+            // should parent be turned into an ObjectId?
+            // LOOKS LIKE NEW REGION SAVED SUCCESSFULLY, BUT NOT BEING ADDED TO PARENT ARRAY 
+            if (parent !== "") {
+                const parentRegion = await Region.findById(parent);
+                console.log("Parent region: " + JSON.stringify(parentRegion));
+                let newSubregions = parentRegion.subregions.push(newRegion);
+                const updatedParent = await Region.findByIdAndUpdate(parent, { subregions: {newSubregions} });
+                console.log("updatedParent: " + JSON.stringify(updatedParent));
+            }
             if (updated) return objId;
             return "Error:DB";
         },

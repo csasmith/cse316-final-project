@@ -25,14 +25,10 @@ const CreateMapModal = (props) => {
             alert("Failed to save new map");
             return
         }
-        else if (data.addSubregion === 'Error:Dup') {
-            alert("Map with that name already exists");
-            return
-        }
         const mapId = data.addSubregion;
         console.log(mapId);
         props.toggleShowCreate(false);
-        props.history.push('/home/sheet/' + mapId);
+        props.selectMap(mapId);
     }
 
     return (

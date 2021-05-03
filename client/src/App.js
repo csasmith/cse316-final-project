@@ -1,12 +1,14 @@
-import React 			from 'react';
-import Welcome 			from './components/Welcome';
-import CreateAccount 	from './components/CreateAccount';
-import Login 			from './components/Login';
-import Home				from './components/Home';
-import { useQuery } 	from '@apollo/client';
-import * as queries 	from './cache/queries';
-import { jsTPS } 		from './utils/jsTPS';
-import { BrowserRouter, Switch, Route, Redirect, Link } from 'react-router-dom';
+import React 						from 'react';
+import Welcome 						from './components/Welcome';
+import CreateAccount 				from './components/CreateAccount';
+import Login 						from './components/Login';
+import Home							from './components/Home';
+import RegionSpreadSheet			from './components/RegionSpreadSheet';
+import { useQuery } 				from '@apollo/client';
+import * as queries 				from './cache/queries';
+import { jsTPS } 					from './utils/jsTPS';
+import { BrowserRouter, Switch,
+		 Route, Redirect } 			from 'react-router-dom';
  
 const App = () => {
 	let user = null;
@@ -45,10 +47,12 @@ const App = () => {
 				<Route path='/login'>
 					<Login fetchUser={refetch} />
 				</Route>
-				<Route path='/home'>
+				<Route exact path='/home'>
 					<Home fetchUser={refetch} user={user} />
 				</Route>
-				
+				<Route path='/home/sheet/:id'>
+                    <RegionSpreadSheet fetchUser={refetch} user={user} />
+                </Route>
 			</Switch>
 		</BrowserRouter>
 	);
