@@ -62,10 +62,7 @@ export const ADD_SUBREGION = gql`
 // not sure how undo will work with this
 export const DELETE_SUBREGION = gql`
 	mutation DeleteSubregion($id: String!) {
-		deleteSubregion(_id: $id) {
-			_id
-			parent
-		}
+		deleteSubregion(_id: $id) 
 	}
 `;
 

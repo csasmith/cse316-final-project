@@ -66,8 +66,14 @@ module.exports = {
             return "Error:DB";
         },
         deleteSubregion: async (_, args) => {
-            // Undo needs to return to original index!
-            return 'delete subregion';
+            const { _id } = args;
+            console.log('id to delete: ' + _id);
+            let objId = new ObjectId(_id);
+            const deletedDoc = await Region.findByIdAndDelete(objId);
+            if (deletedDoc) {
+                console.log(deletedDoc);
+            }
+            return objId;
         },
         changeSubregionParent: async (_, args) => {
             return "change subregion parent"

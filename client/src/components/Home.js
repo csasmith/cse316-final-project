@@ -9,7 +9,8 @@ import { WLayout, WLHeader,
          WLSide, WRow, WCol}    from 'wt-frontend';
 import { GET_MAPS }             from '../cache/queries';
 import { LOGOUT, 
-         ADD_SUBREGION }        from '../cache/mutations';
+         ADD_SUBREGION,
+         DELETE_SUBREGION }        from '../cache/mutations';
 import { useMutation,
          useQuery, 
          useApolloClient }      from '@apollo/client';
@@ -19,6 +20,7 @@ const Home = (props) => {
     const [recentMapId, setRecentMapId] = useState("");
     const [Logout] = useMutation(LOGOUT);
     const [CreateMap] = useMutation(ADD_SUBREGION);
+    const [DeleteMap] = useMutation(DELETE_SUBREGION);
     const client = useApolloClient();
     const [showDelete, toggleShowDelete] = useState(false);
     const [deleteMapId, setDeleteMapId] = useState({});
@@ -53,6 +55,11 @@ const Home = (props) => {
         setRecentMapId(id);
         // history.push({pathname: `home/sheet/${id}`, state: {user: location.state.user, ancestors: []}});
         history.push({pathname: `home/sheet/${id}`, state: { ancestors: []}});
+    }
+
+    const deleteMap = async (_id) => {
+        const deletedId = await DeleteMap({ variables: { id: _id }});
+        await refetch();
     }
 
     const handleLogout = async (e) => {
@@ -114,6 +121,7 @@ const Home = (props) => {
                                     <WCol size='4' className='map-trash'>
                                         <WButton wType='texted'
                                                  hoverAnimation='darken'
+                                                 onClick={() => deleteMap(entry._id)}
                                         >
                                             <i className='material-icons small'>delete</i>
                                         </WButton>
