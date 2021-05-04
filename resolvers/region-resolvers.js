@@ -9,7 +9,7 @@ module.exports = {
          */
         getAllMaps: async (_, __, { req }) => {
             const userId = new ObjectId(req.userId);
-            // console.log("userId: " + userId);
+            console.log("userId: " + userId);
             if (!userId) return ({});
             const maps = await Region.find({ owner: userId, parent: "" });
             // console.log("maps: " + maps);
