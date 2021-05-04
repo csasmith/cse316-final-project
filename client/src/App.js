@@ -1,6 +1,7 @@
 import React 						from 'react';
 import Welcome 						from './components/Welcome';
 import CreateAccount 				from './components/CreateAccount';
+import UpdateAccount				from './components/UpdateAccount';
 import Login 						from './components/Login';
 import Home							from './components/Home';
 import RegionSpreadSheet			from './components/RegionSpreadSheet';
@@ -14,7 +15,7 @@ const App = () => {
 	let user = null;
     // let transactionStack = new jsTPS();
 	
-    const { loading, error, data, refetch } = useQuery(queries.GET_USER);
+    const { loading, error, data, refetch } = useQuery(queries.GET_USER, {fetchPolicy: 'network-only'});
 
     if(error) { console.log(error); }
 	if(loading) { console.log(loading); }
@@ -35,6 +36,9 @@ const App = () => {
 				</Route>
 				<Route path='/login'>
 					<Login fetchUser={refetch} />
+				</Route>
+				<Route path='/update'>
+					<UpdateAccount fetchUser={refetch} user={user} />
 				</Route>
 				<Route exact path='/home'>
 					<Home fetchUser={refetch} user={user} />
