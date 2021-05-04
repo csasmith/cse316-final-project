@@ -25,6 +25,7 @@ const Login = (props) => {
                 return
             }
         }
+        await props.fetchUser();
         const { _, error, data } = await Login({ variables: { ...input } });
         if (error) { return `Error: ${error.message}` };
         if (data.login._id === null) {

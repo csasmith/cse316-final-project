@@ -45,7 +45,6 @@ const UpdateAccount = (props) => {
         if (data) {
             console.log(data);
             await props.fetchUser();
-            console.log("guess we're good...");
         }
         history.push('/home');
     }

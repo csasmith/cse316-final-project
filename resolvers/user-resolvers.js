@@ -80,10 +80,12 @@ module.exports = {
 		 */
 		update: async (_, args, { req }) => {
 			const { name, email, password } = args;
-			// find current user, then set new fields
-			const updated = await User.updateOne({ _id: req.userId }, { name : name, email: email, password: password });
+			console.log(name, email, password, req.userId);
+			const hashed = await bcrypt.hash(password, 10);
+			const _id = new ObjectId(req.userId);
+			const updated = await User.findByIdAndUpdate(_id, { name : name, email: email, password: hashed });
 			if (!updated) { return {} }
-			console.log("Updated User: " + updated);
+			console.log("Updated User: " + JSON.stringify(updated));
 			return updated;
 		},
 		/** 
