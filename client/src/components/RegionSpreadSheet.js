@@ -28,8 +28,6 @@ const RegionSpreadSheet = (props) => {
     let ancestors = location.state.ancestors; // [{id: id, name: name}]
     console.log("ancestors: " + JSON.stringify(ancestors));
 
-    // get subregions data that will appear in table
-    // console.log("id from params: " + id);
     const { _, error, data, refetch } = useQuery(GET_REGION_BY_ID, { variables : { id: id}, fetchPolicy: 'network-only' });
     if (error) {console.log(error, 'error')};
     if (data) {
@@ -61,6 +59,12 @@ const RegionSpreadSheet = (props) => {
         console.log('newAncestors: ' + JSON.stringify(ancestors));
         await refetch({variables : { id: subregionId}});
         history.push({ pathname: `/home/sheet/${subregionId}`, state: { ancestors: ancestors }});
+    }
+
+    const goToRegionView = (regionId) => {
+        ancestors.push({ id: id, name: regionData.name });
+        console.log('newAncestors: ' + JSON.stringify(ancestors));
+        history.push({ pathname: `/home/view/${regionId}`, state: { ancestors: ancestors} });
     }
 
     const handleLogout = async (e) => {
@@ -165,7 +169,8 @@ const RegionSpreadSheet = (props) => {
                             regionData.subregions ? 
                                 regionData.subregions.map((subregion) => (
                                     <RegionEntry subregion={subregion}
-                                                 goToSubregion={goToSubregion}/>
+                                                 goToSubregion={goToSubregion}
+                                                 goToRegionView={goToRegionView}/>
                                 ))
                                 :
                                 null

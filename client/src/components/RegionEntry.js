@@ -39,7 +39,10 @@ const RegionEntry = (props) => {
                 img
             </WCol>
             <WCol className='table-col' size='4'>
-                <WButton wType='texted' className='table-link'> {props.subregion.landmarks} </WButton>
+                <WButton wType='texted' className='table-link'
+                         onClick={() => props.goToRegionView(props.subregion._id)}> 
+                    {props.subregion.landmarks} 
+                </WButton>
             </WCol>
         </WRow>
         : null

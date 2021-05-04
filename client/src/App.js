@@ -5,6 +5,7 @@ import UpdateAccount				from './components/UpdateAccount';
 import Login 						from './components/Login';
 import Home							from './components/Home';
 import RegionSpreadSheet			from './components/RegionSpreadSheet';
+import RegionViewer					from './components/RegionViewer';
 import { useQuery } 				from '@apollo/client';
 import * as queries 				from './cache/queries';
 import { jsTPS } 					from './utils/jsTPS';
@@ -46,6 +47,9 @@ const App = () => {
 				<Route path='/home/sheet/:id'>
                     <RegionSpreadSheet fetchUser={refetch} user={user} />
                 </Route>
+				<Route path='/home/view/:id'>
+					<RegionViewer fetchuser={refetch} user={user} />
+				</Route>
 			</Switch>
 		</BrowserRouter>
 	);

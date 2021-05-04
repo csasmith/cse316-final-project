@@ -214,6 +214,42 @@ html {
     width: 10%;
 }
 
+.viewer-main {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+.viewer {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1%;
+    margin-left: 5%;
+    margin-bottom:5%;
+}
+.viewer-lside > .wrow {
+    margin-top: 1%;
+    
+}
+
+.parent-region-link {
+    padding:0;
+    margin:0;
+    display:flex;
+}
+
+.landmarks-editor {
+    width: 70%;
+    height: 80%;
+}
+
+.input-landmark {
+    width: 70%;
+}
+
 .modal-header {
     text-align: center;
 }

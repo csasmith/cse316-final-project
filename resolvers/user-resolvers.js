@@ -80,7 +80,6 @@ module.exports = {
 		 */
 		update: async (_, args, { req }) => {
 			const { name, email, password } = args;
-			console.log(name, email, password, req.userId);
 			const hashed = await bcrypt.hash(password, 10);
 			const _id = new ObjectId(req.userId);
 			const updated = await User.findByIdAndUpdate(_id, { name : name, email: email, password: hashed });

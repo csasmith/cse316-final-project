@@ -63,6 +63,10 @@ html, body {
     font-size: small;
 }
 
+.arrow {
+    color: white;
+}
+
 .account-link {
     color: rgb(255, 128, 192) !important;
 }
@@ -161,6 +165,14 @@ html, body {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+.viewer {
+    color: white;
+}
+
+.landmarks-editor {
+    background-color: black;
 }
 
 .modal-header {
