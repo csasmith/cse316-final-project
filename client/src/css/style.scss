@@ -3,7 +3,7 @@
     $background-color: rgb(55,55,55),//#d9d6cc,
     $navbar-background-color: black,//rgb(64, 69, 78),
     $sidebar-background-color: #2b2e36,//#353a44,
-    $text-color: #e9edf0,
+    $text-color: white,
     $modal-background: rgb(55, 55, 55),
     $modal-section-padding: 24px,
     $modal-radius: 4px,
@@ -100,6 +100,10 @@ html, body {
 .home-maps {
     background-color:pink;
     scrollbar-width: thin;
+}
+
+.map-edit-name {
+    color: black;
 }
 
 .home-side {

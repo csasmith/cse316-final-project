@@ -9,10 +9,10 @@ module.exports = {
          */
         getAllMaps: async (_, __, { req }) => {
             const userId = new ObjectId(req.userId);
-            console.log("userId: " + userId);
+            // console.log("userId: " + userId);
             if (!userId) return ({});
             const maps = await Region.find({ owner: userId, parent: "" });
-            console.log("maps: " + maps);
+            // console.log("maps: " + maps);
             if (maps) return maps;
             return ({});
         },
@@ -79,7 +79,12 @@ module.exports = {
             return "change subregion parent"
         },
         setRegionField: async (_, args) => {
-            return 'set region field';
+            const { _id, field, val } = args;
+            console.log(_id, field, val);
+            let objId = new ObjectId(_id);
+            const updatedDoc = await Region.findByIdAndUpdate(objId, { name: val });
+            console.log(updatedDoc);
+            return val;
         }
     }
 }

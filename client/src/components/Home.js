@@ -6,11 +6,13 @@ import { NavLink, Redirect,
 import { WLayout, WLHeader, 
          WLMain, WNavbar, 
          WNavItem, WButton, 
-         WLSide, WRow, WCol}    from 'wt-frontend';
+         WLSide, WRow, WCol,
+         WInput }               from 'wt-frontend';
 import { GET_MAPS }             from '../cache/queries';
 import { LOGOUT, 
          ADD_SUBREGION,
-         DELETE_SUBREGION }        from '../cache/mutations';
+         DELETE_SUBREGION,
+         SET_REGION_FIELD }     from '../cache/mutations';
 import { useMutation,
          useQuery, 
          useApolloClient }      from '@apollo/client';
@@ -21,9 +23,11 @@ const Home = (props) => {
     const [Logout] = useMutation(LOGOUT);
     const [CreateMap] = useMutation(ADD_SUBREGION);
     const [DeleteMap] = useMutation(DELETE_SUBREGION);
+    const [RenameMap] = useMutation(SET_REGION_FIELD);
     const client = useApolloClient();
     const [showDelete, toggleShowDelete] = useState(false);
     const [deleteMapId, setDeleteMapId] = useState({});
+    const [showEditMapId, toggleShowEditMap] = useState(-1);
     const [showCreate, toggleShowCreate] = useState(false);
     let history = useHistory();
     let location = useLocation();
@@ -60,6 +64,18 @@ const Home = (props) => {
     const deleteMap = async (_id) => {
         const deletedId = await DeleteMap({ variables: { id: _id }});
         await refetch();
+    }
+
+    const renameMap = async (e) => {
+        let _id = showEditMapId;
+        const newName = e.target.value;
+        console.log(newName);
+        if (newName) {
+            const updatedName = await RenameMap({variables: {id: _id, field: 'name', val: newName}});
+            console.log('updatedName: ' + JSON.stringify(updatedName));
+            await refetch();
+        }
+        toggleShowEditMap(-1);
     }
 
     const handleLogout = async (e) => {
@@ -109,16 +125,41 @@ const Home = (props) => {
                         {
                             maps.map((entry) => (
                                 <WRow className='map-entry'>
-                                    <WCol size='8' className='map-name'>
+                                    {
+                                        showEditMapId !== entry._id ? 
+                                        <WCol size='8' className='map-name'>
+                                            <WButton wType='texted'
+                                                    className='create-map-btn'
+                                                    hoverAnimation='lighten'
+                                                    onClick={() => selectMap(entry._id)}
+                                            >
+                                                {entry.name}
+                                            </WButton>
+                                        </WCol>
+                                        :
+                                        <WCol size='8'>
+                                            <WInput wType='outlined'
+                                                    className='map-edit-name'
+                                                    inputType='text'
+                                                    name='name'
+                                                    placeholderText='Enter New Map Name'
+                                                    barAnimation='left-to-right'
+                                                    labelAnimation='shrink'
+                                                    hoverAnimation='solid'
+                                                    onBlur={renameMap}
+                                            />
+                                        </WCol>
+                                    }
+                                    
+                                    <WCol size='2' className='map-edit'>
                                         <WButton wType='texted'
-                                                 className='create-map-btn'
-                                                 hoverAnimation='lighten'
-                                                 onClick={() => selectMap(entry._id)}
+                                                 hoverAnimation='darken'
+                                                 onClick={() => toggleShowEditMap(entry._id)}
                                         >
-                                            {entry.name}
+                                            <i className='material-icons small'>edit</i>
                                         </WButton>
                                     </WCol>
-                                    <WCol size='4' className='map-trash'>
+                                    <WCol size='2' className='map-trash'>
                                         <WButton wType='texted'
                                                  hoverAnimation='darken'
                                                  onClick={() => deleteMap(entry._id)}
