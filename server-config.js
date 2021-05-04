@@ -33,6 +33,7 @@ const validateTokens = async(req, res, next) => {
 	// Unauthorized request
 	if(!accessToken && !refreshToken) { 
 		req.userId = null;
+		console.log("Unauthorized request");
 		return next(); 
 	}
 	// Check for access token

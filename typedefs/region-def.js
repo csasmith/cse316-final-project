@@ -5,18 +5,18 @@ const { gql } = require('apollo-server');
 
 const typeDefs = gql`
     type Region {
-        _id: String!
-        owner: String!
-        name: String!
+        _id: String
+        owner: String
+        name: String
         parent: String
-        subregions: [Region!]
-        capital: String!
-        leader: String!
-        landmarks: [String!]
+        subregions: [Region]
+        capital: String
+        leader: String
+        landmarks: [String]
     }
     extend type Query {
         getAllMaps: [Region]
-        getRegionById(_id: String): Region
+        getRegionById(_id: String!): Region
         getChildrenLandmarks(_id: String): [String]
         getThisRegionLandmarks(_id:String): [String]
     }

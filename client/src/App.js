@@ -23,17 +23,6 @@ const App = () => {
 		if(getCurrentUser !== null) { user = getCurrentUser; }
     }
 
-	// consider hashrouter instead
-
-	// do something like App should render Welcome component, -- maybe redirect '/' to '/welcome'
-	// and then switch/routes to all different paths
-	// then those components (either in their file, or maybe this one?)
-	// check for auth and if no auth they redirect to '/'
-
-	// history seems nice bc ie when verifying login can history.push('/home')
-	// location nice bc we can save info for when we go back?
-	// almost definitely use useParams, might not even have to use location bc of this
-
 	return(
 		<BrowserRouter>
 			<Switch>

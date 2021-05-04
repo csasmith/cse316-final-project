@@ -58,6 +58,11 @@ html, body {
     color: red !important;
 }
 
+.toolbar-path-entry {
+    color: white;
+    font-size: small;
+}
+
 .account-link {
     color: rgb(255, 128, 192) !important;
 }
@@ -89,7 +94,7 @@ html, body {
 }
 
 .home-maps {
-    background-color:rgb(255, 170, 170);
+    background-color:pink;
     scrollbar-width: thin;
 }
 
@@ -121,12 +126,41 @@ html, body {
     color: white;
 }
 
+.table-entries {
+    background-color: pink;
+}
+
 .table-header-btn {
     color: white;
 }
 
 .table-header-col {
     font-weight: bold;
+    //border: solid;
+}
+
+.table-entries {
+    border-style: solid;
+    border-width: 1px;
+}
+
+.table-col {
+    font-weight: bold;
+    border: solid;
+    border-collapse: collapse;
+    border-width: 1px;
+}
+
+.delete-table-entry-btn {
+    color: red;
+}
+
+.table-link {
+    color: #0645AD;
+    font-weight: bold;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .modal-header {

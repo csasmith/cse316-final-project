@@ -2,7 +2,7 @@ import React, { useState }      from 'react';
 import CreateMapModal           from './CreateMapModal';
 import { NavLink, Redirect,
          useHistory, Switch,
-         Route }                from 'react-router-dom';
+         Route, useLocation }   from 'react-router-dom';
 import { WLayout, WLHeader, 
          WLMain, WNavbar, 
          WNavItem, WButton, 
@@ -24,6 +24,7 @@ const Home = (props) => {
     const [deleteMapId, setDeleteMapId] = useState({});
     const [showCreate, toggleShowCreate] = useState(false);
     let history = useHistory();
+    let location = useLocation();
     let maps = [];
 
     // will this be enough for maps to be there when we navigate home?
@@ -40,7 +41,7 @@ const Home = (props) => {
     }
 
     const selectMap = async (id) => {
-        const {_, error, data } = await refetch();
+        const {_, error, data } = await refetch(); // refetch is useQuery(GET_MAPS)
         if (error) {console.log(error.message)};
         if (data) {
             maps = data.getAllMaps;
@@ -50,7 +51,8 @@ const Home = (props) => {
             maps.unshift(selectedMap);
         }
         setRecentMapId(id);
-        history.push(`home/sheet/${id}`);
+        // history.push({pathname: `home/sheet/${id}`, state: {user: location.state.user, ancestors: []}});
+        history.push({pathname: `home/sheet/${id}`, state: { ancestors: []}});
     }
 
     const handleLogout = async (e) => {
@@ -59,12 +61,15 @@ const Home = (props) => {
         if (error) {console.log(error.message)};
         if (data) {
             let reset = await client.resetStore();
-            if (reset) history.push('/welcome');
+            if (reset) history.push('/');
         } else {
-            history.push('/welcome');
+            history.push('/');
         }
     }
     
+    // remember if this breaks just go back to props.user
+    // console.log("location.state.user: " + JSON.stringify(location.state.user));
+    // {{pathname: '/home', state: {user: location.state.user}}}
     return (
         props.user ? 
         <WLayout WLayout='header' className='container-secondary'>
@@ -72,7 +77,7 @@ const Home = (props) => {
                 <WNavbar color='colored'>
                     <ul>
                         <WNavItem>
-                            <NavLink to="/home" className='home-link'>
+                            <NavLink to='/home' className='home-link'>
                                 <h4>The World<br />Data Mapper</h4>
                             </NavLink>
                         </WNavItem>

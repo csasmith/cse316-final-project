@@ -20,6 +20,25 @@ html {
     flex-direction: column;
 }
 
+.toolbar-lside {
+    width: 60%;
+}
+
+.toolbar-path {
+    white-space: nowrap;
+    text-overflow: clip;
+    overflow-x: scroll;
+    scrollbar-width: none;
+    max-width: 50%;
+}
+.toolbar-path::-webkit-scrollbar {
+    display: none;
+}
+
+.toolbar-path-entry {
+    padding:1px;
+}
+
 .welcome-main {
     display: flex;
     flex-direction: column;
@@ -39,7 +58,8 @@ html {
 .main {
     height: 100%;
     display: flex;
-    justify-content: center
+    justify-content: center;
+    overflow: hidden;
 }
 
 .account-container {
@@ -148,6 +168,8 @@ html {
     justify-content:center;
     align-items: stretch;
     width: 80%;
+    height: 90%;
+    padding-top: 1%;
 }
 
 .table-controls > * {
@@ -161,6 +183,35 @@ html {
     flex-direction: row;
     align-items: center;
     justify-content: center;
+}
+
+.table-col {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.table-header-btn {
+    padding-left:1px;
+}
+
+.table-entries {
+    overflow-y:scroll;
+}
+
+.table-link {
+    display: block;
+    padding-left: 3%;
+    padding-right: 3%;
+    width: 90%;
+}
+
+.delete-table-entry-btn {
+    padding-left: 2px;
+    padding-right: 2px;
+    width: 10%;
 }
 
 .modal-header {

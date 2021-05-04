@@ -15,7 +15,7 @@ const regionSchema = new Schema(
 regionSchema.add(
     {
         parent: String, // could make this id instead
-        subregions: { type: [regionSchema], required: true } // could also make these ids?
+        subregions: [regionSchema] // could also make these ids?
     }
 );
 
