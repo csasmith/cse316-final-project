@@ -32,4 +32,34 @@ const typeDefs = gql`
     }
 `;
 
+// const typeDefs = gql`
+//     type Region {
+//         _id: String
+//         owner: String
+//         ancestors: [String]
+//         name: String
+//         capital: String
+//         leader: String
+//         landmarks: [String]
+//         subregions: [String]
+//         index: String
+//     }
+//     extend type Query {
+//         getAllMaps: [Region]
+//         getRegionById(_id: String!): Region
+//         getChildrenLandmarks(_id: String): [String]
+//         getThisRegionLandmarks(_id:String): [String]
+//     }
+//     extend type Mutation {
+//         addSubregion(subregion: RegionInput!): String
+//         deleteSubregion(_id: String!): Region
+//         changeSubregionParent(subregion_id: String!, newParent_id: String!): String
+//         setRegionField(_id: String!, field: String!, val: String!): String
+//     }
+//     input RegionInput {
+//         name: String
+//         parent: String
+//     }
+// `;
+
 module.exports = { typeDefs: typeDefs };

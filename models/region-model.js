@@ -12,6 +12,21 @@ const regionSchema = new Schema(
     { timestamp: true }
 );
 
+// const regionSchema = new Schema(
+//     {
+//         _id: { type: ObjectId, required: true },
+//         owner: { type: String, required: true },
+//         ancestors: [String],
+//         name: { type: String, required: true },
+//         capital: { type: String, required: true },
+//         leader: { type: String, required: true },
+//         landmarks: { type: [String], required: true },
+//         subregions: [String],
+//         index: String
+//     }, 
+//     { timestamp: true }
+// );
+
 regionSchema.add(
     {
         parent: String, // could make this id instead
