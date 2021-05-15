@@ -41,7 +41,7 @@ const Login = (props) => {
     }
 
     return (
-        <WLayout WLayout='header' className='container-secondary'>
+        <WLayout wLayout='header' className='container-secondary'>
             <WLHeader>
                 <WNavbar color='colored'>
                     <ul>
@@ -66,7 +66,7 @@ const Login = (props) => {
                 </WNavbar>
             </WLHeader>
             <WLMain className='main'>
-                <WLayout WLayout='header' className='account-container'>
+                <WLayout wLayout='header' className='account-container'>
                     <WLHeader className='account-header'>
                         <span className='account-title'>Login</span>
                         <WButton 
