@@ -11,7 +11,7 @@ module.exports = {
             const userId = new ObjectId(req.userId);
             console.log("userId: " + userId);
             if (!userId) return ({});
-            const maps = await Region.find({ owner: userId, parent: "" });
+            const maps = await Region.find({ owner: userId, path: '' }).sort({ index: 'asc'}); // might mess with required bit
             // console.log("maps: " + maps);
             if (maps) return maps;
             return ({});
@@ -32,37 +32,26 @@ module.exports = {
     Mutation: {
         addSubregion: async (_, args, { req }) => {
             const { subregion } = args;
-            const { name, parent } = subregion;
-            console.log("addSubregion name: " + name + ", parent: " + parent);
-            const objId = new ObjectId();
+            const { _id, path, name, index } = subregion;
+            console.log(subregion);
+            const objId = _id ? new ObjectId(_id) : new ObjectId();
             const newRegion = new Region({
                 _id: objId,
                 owner: req.userId,
+                path: path,
                 name: name,
-                parent: parent,
-                subregions: [],
                 capital: "None",
                 leader: "None",
-                landmarks: []
+                landmarks: [],
+                index: index
             });
             const updated = await newRegion.save();
             console.log("New region: " + updated);
             // now add newRegion to parent if parent exists
             // should parent be turned into an ObjectId?
             // LOOKS LIKE NEW REGION SAVED SUCCESSFULLY, BUT NOT BEING ADDED TO PARENT ARRAY 
-            let updatedParent = {};
-            if (parent !== "") {
-                parentId = new ObjectId(parent);
-                const parentRegion = await Region.findById(parentId);
-                console.log("Parent region: " + parentRegion);
-                let subregions = parentRegion.subregions;
-                console.log("oldSubregions: " + subregions);
-                subregions.push(newRegion);
-                console.log("newSubregions: " + subregions);
-                updatedParent = await Region.findByIdAndUpdate(parentId, { subregions: subregions });
-                console.log("updatedParent: " + updatedParent);
-            }
-            if (updated && updatedParent) return objId;
+
+            if (updated) return objId;
             return "Error:DB";
         },
         deleteSubregion: async (_, args) => {
@@ -82,7 +71,7 @@ module.exports = {
             const { _id, field, val } = args;
             console.log(_id, field, val);
             let objId = new ObjectId(_id);
-            const updatedDoc = await Region.findByIdAndUpdate(objId, { name: val });
+            const updatedDoc = await Region.findByIdAndUpdate(objId, { [field]: val });
             console.log(updatedDoc);
             return val;
         }

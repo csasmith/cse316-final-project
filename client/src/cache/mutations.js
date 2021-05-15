@@ -62,7 +62,16 @@ export const ADD_SUBREGION = gql`
 // delete subregion and add subregion have to be undone, so must return region...
 export const DELETE_SUBREGION = gql`
 	mutation DeleteSubregion($id: String!) {
-		deleteSubregion(_id: $id) 
+		deleteSubregion(_id: $id) {
+			_id
+			owner
+			path
+			name
+			capital
+			leader
+			landmarks
+			index
+		}
 	}
 `;
 

@@ -15,6 +15,7 @@ export const GET_MAPS = gql`
 			_id
 			name
 			owner
+			index
 		}
 	}
 `;
@@ -24,20 +25,12 @@ export const GET_REGION_BY_ID = gql`
 		getRegionById(_id: $id) {
 			_id
 			owner
+			path
 			name
-			parent
-			subregions {
-				_id
-				owner
-				name
-				parent
-				capital
-				leader
-				landmarks
-			}
 			capital
 			leader
 			landmarks
+			index
 		}
 	}
 `;

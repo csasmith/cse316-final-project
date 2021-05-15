@@ -1,37 +1,18 @@
 const { model, Schema, ObjectId } = require('mongoose');
 
+// remember if stuff isn't working, mess with required field...
 const regionSchema = new Schema(
     {
         _id: { type: ObjectId, required: true },
         owner: { type: String, required: true },
+        path: String,
         name: { type: String, required: true },
         capital: { type: String, required: true },
         leader: { type: String, required: true },
-        landmarks: { type: [String], required: true }
+        landmarks: { type: [String], required: true },
+        index: { type: String, required: true }
     }, 
     { timestamp: true }
-);
-
-// const regionSchema = new Schema(
-//     {
-//         _id: { type: ObjectId, required: true },
-//         owner: { type: String, required: true },
-//         ancestors: [String],
-//         name: { type: String, required: true },
-//         capital: { type: String, required: true },
-//         leader: { type: String, required: true },
-//         landmarks: { type: [String], required: true },
-//         subregions: [String],
-//         index: String
-//     }, 
-//     { timestamp: true }
-// );
-
-regionSchema.add(
-    {
-        parent: String, // could make this id instead
-        subregions: [regionSchema] // could also make these ids?
-    }
 );
 
 const Region = model('Region', regionSchema);
