@@ -26,8 +26,12 @@ const typeDefs = gql`
     }
     input RegionInput {
         _id: String
+        owner: String
         path: String
         name: String
+        capital: String
+        leader: String
+        landmarks: [String]
         index: String
     }
 `;

@@ -43,7 +43,7 @@ module.exports = {
     Mutation: {
         addSubregion: async (_, args, { req }) => {
             const { subregion } = args;
-            const { _id, path, name, index } = subregion;
+            const { _id, owner, path, name, capital, leader, landmarks, index } = subregion;
             console.log(subregion);
             const objId = _id ? new ObjectId(_id) : new ObjectId();
             const newRegion = new Region({
@@ -51,9 +51,9 @@ module.exports = {
                 owner: req.userId,
                 path: path,
                 name: name,
-                capital: "None",
-                leader: "None",
-                landmarks: [],
+                capital: capital,
+                leader: leader,
+                landmarks: landmarks,
                 index: index
             });
             const updated = await newRegion.save();
