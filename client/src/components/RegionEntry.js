@@ -23,7 +23,7 @@ const RegionEntry = (props) => {
                     <WCol className='table-col' size='4'>
                         <WButton className='delete-table-entry-btn' 
                                  wType='texted' 
-                                 onClick={() => props.deleteSubregion(props.subregion)}>
+                                 onClick={() => props.handleDeleteSubregion(props.subregion)}>
                             <i className='material-icons small'>close</i>
                         </WButton>
                         <WButton wType='texted' className='table-link'

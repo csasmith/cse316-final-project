@@ -1,5 +1,6 @@
 import React, { useState,
                 useEffect }                 from 'react';
+import DeleteModal                          from './DeleteModal';
 import RegionEntry                          from './RegionEntry';
 import { NavLink, Redirect,
          useHistory, useParams,
@@ -28,8 +29,9 @@ const RegionSpreadSheet = (props) => {
     const [SetRegionField] = useMutation(SET_REGION_FIELD);
 
     /* state hooks */
-    const [deleteRegionId, toggleShowDeleteRegion] = useState(0);
+    const [regionToDelete, toggleShowDeleteRegion] = useState(null);
     const [newIndex, setNewIndex] = useState(0);
+    const [tpsMutex, toggleMutex] = useState(false);
 
     /* misc hooks */
     const client = useApolloClient();
@@ -86,16 +88,25 @@ const RegionSpreadSheet = (props) => {
 
     /* tps redo */
     const tpsRedo = async () => {
-        const retval = await tps.doTransaction();
-        await refetchSubregions();
-        return retval;
+        if (!tpsMutex) {
+            toggleMutex(true); // idk why this works because async function...
+            const retval = await tps.doTransaction();
+            await refetchSubregions();
+            toggleMutex(false);
+            return retval;
+        }
+        
     }
 
     /* tps undo */
     const tpsUndo = async () => {
-        const retval = await tps.undoTransaction();
-        await refetchSubregions();
-        return retval;
+        if (!tpsMutex) {
+            toggleMutex(true);
+            const retval = await tps.undoTransaction();
+            await refetchSubregions();
+            toggleMutex(false);
+            return retval;
+        }
     }
 
 
@@ -104,7 +115,11 @@ const RegionSpreadSheet = (props) => {
         const newSubregion = {
             _id: '',
             path: region.path ? region.path + ',' + id : ',' + id,
+            owner: '',
             name: 'Untitled',
+            capital: 'None',
+            leader: 'None',
+            landmarks: [],
             index: '' + newIndex
         };
         let transaction = new AddDeleteSubregion_Transaction(newSubregion, 'add', AddSubregion, DeleteSubregion);
@@ -131,6 +146,7 @@ const RegionSpreadSheet = (props) => {
         ancestors.push({ _id: id, name: region.name });
         console.log('newAncestors: ' + JSON.stringify(ancestors));
         // await refetchRegion({variables : { id: subregionId}});
+        tps.clearAllTransactions();
         history.push({ pathname: `/home/sheet/${subregionId}`, state: { ancestors: ancestors }});
     }
 
@@ -153,12 +169,22 @@ const RegionSpreadSheet = (props) => {
         }
     }
 
+    const handleKeyDown = (e) => {
+        if (e.ctrlKey) {
+            if (e.keyCode === 90) {
+                tpsUndo();
+            } else if (e.keyCode === 89) {
+                tpsRedo();
+            }
+        }
+    }
+
     // if this breaks just do props.user
     // console.log("location.state.user: " + JSON.stringify(location.state.user));
     // {{pathname: '/home', state: {user: location.state.user}}}
     return (
         props.user ? 
-        <WLayout wLayout='header' className='container-secondary'>
+        <WLayout tabIndex='0' onKeyDown={handleKeyDown} wLayout='header' className='container-secondary'>
             <WLHeader>
                 <WNavbar color='colored'>
                     <ul className='toolbar-lside'>
@@ -210,13 +236,13 @@ const RegionSpreadSheet = (props) => {
                             <WButton className='sheet-undo' 
                                      wType='texted' 
                                      disabled={!tps.hasTransactionToUndo()}
-                                     onClick={tpsUndo}>
+                                     onClick={tps.hasTransactionToUndo() ? tpsUndo : () => {}}>
                                 <i className='material-icons'>undo</i>
                             </WButton>
                             <WButton className='sheet-redo' 
                                      wType='texted' 
                                      disabled={!tps.hasTransactionToRedo()}
-                                     onClick={tpsRedo}> 
+                                     onClick={tps.hasTransactionToRedo() ? tpsRedo : () => {}}> 
                                 <i className='material-icons'>redo</i>
                             </WButton>
                         </WCol>
@@ -256,7 +282,7 @@ const RegionSpreadSheet = (props) => {
                                     <RegionEntry subregion={subregion}
                                                  goToSubregion={goToSubregion}
                                                  goToRegionView={goToRegionView}
-                                                 deleteSubregion={handleDeleteSubregion}
+                                                 handleDeleteSubregion={toggleShowDeleteRegion}
                                                  key={subregion._id}/>
                                 ))
                                 :
@@ -266,7 +292,11 @@ const RegionSpreadSheet = (props) => {
                 </WLMain>
             </WLMain>
             {
-                /* showDelete && (<DeleteModal isVisible={showDelete} delete={deleteMap}) */
+                regionToDelete && (<DeleteModal 
+                                 regionToDelete={regionToDelete} 
+                                 handleDelete={handleDeleteSubregion}
+                                 label='Subregion' 
+                                 setShowDelete={toggleShowDeleteRegion}/>)
             }
         </WLayout>
 
