@@ -13,7 +13,6 @@ const CreateMapModal = (props) => {
     }
 
     const handleCreate = async (e) => {
-        console.log("hey!!!")
         if (!input['name']) {
             alert("Must fill out map name field");
             return

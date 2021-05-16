@@ -45,6 +45,7 @@ const RegionEntry = (props) => {
                 </WButton>
             </WCol>
         </WRow>
+        
         : null
     )
 }
