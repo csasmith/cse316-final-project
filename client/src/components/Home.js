@@ -1,5 +1,6 @@
 import React, { useState }      from 'react';
 import CreateMapModal           from './CreateMapModal';
+import DeleteModal              from './DeleteModal';
 import { NavLink, Redirect,
          useHistory, Switch,
          Route, useLocation }   from 'react-router-dom';
@@ -19,59 +20,58 @@ import { useMutation,
 
 const Home = (props) => {
     
-    const [recentMapId, setRecentMapId] = useState("");
     const [Logout] = useMutation(LOGOUT);
     const [CreateMap] = useMutation(ADD_SUBREGION);
     const [DeleteMap] = useMutation(DELETE_SUBREGION);
-    const [RenameMap] = useMutation(SET_REGION_FIELD);
+    const [SetRegionField] = useMutation(SET_REGION_FIELD);
     const client = useApolloClient();
-    const [showDelete, toggleShowDelete] = useState(false);
-    const [deleteMapId, setDeleteMapId] = useState({});
-    const [showEditMapId, toggleShowEditMap] = useState(-1);
+    const [deleteMapId, toggleShowDeleteMap] = useState(0);
+    const [editMapId, toggleShowEditMap] = useState(-1);
     const [showCreate, toggleShowCreate] = useState(false);
     let history = useHistory();
     let location = useLocation();
     let maps = [];
 
-    // will this be enough for maps to be there when we navigate home?
     const { _, error, data, refetch } = useQuery(GET_MAPS);
     if (error) {console.log(error.message)};
     if (data) {
         maps = data.getAllMaps;
-        if (recentMapId) { 
-            let recentMap = maps.find(map => map._id === recentMapId);
-            maps = maps.filter(map => map._id !== recentMapId);
-            maps.unshift(recentMap);
-        };
-        console.log(JSON.stringify(maps));
+        // console.log('All maps on render: ' + JSON.stringify(maps));
     }
 
     const selectMap = async (id) => {
+        // swap indices of most recent and selected
+
         const {_, error, data } = await refetch(); // refetch is useQuery(GET_MAPS)
         if (error) {console.log(error.message)};
         if (data) {
             maps = data.getAllMaps;
-            let selectedMap = maps.find(map => map._id === id);
-            if (!selectedMap) {console.log("selected map DNE, this will not go well...")};
-            maps = maps.filter(map => map._id !== recentMapId);
-            maps.unshift(selectedMap);
+            if (maps.length > 1) {
+                const selectedMap = maps.find(map => map._id === id);
+                const mostRecentMap = maps.find(map => map.index === '0'); // should be same as maps[0]
+                const newSelectedIndex = await SetRegionField({variables: {id: selectedMap._id, field: 'index', val: mostRecentMap.index}});
+                const oldSelectedIndex = await SetRegionField({variables: {id: mostRecentMap._id, field: 'index', val: selectedMap.index}});
+            }
+            await refetch();
+            // console.log('Did the indices get swapped correctly? ' + JSON.stringify(data.getAllMaps));
         }
-        setRecentMapId(id);
-        // history.push({pathname: `home/sheet/${id}`, state: {user: location.state.user, ancestors: []}});
-        history.push({pathname: `home/sheet/${id}`, state: { ancestors: []}});
+
+        // history.push(`home/sheet/${id}`);
     }
 
+
     const deleteMap = async (_id) => {
-        const deletedId = await DeleteMap({ variables: { id: _id }});
+        const deleted = await DeleteMap({ variables: { id: _id }});
+        console.log('deleted map: ' + JSON.stringify(deleted));
         await refetch();
     }
 
     const renameMap = async (e) => {
-        let _id = showEditMapId;
+        let _id = editMapId;
         const newName = e.target.value;
         console.log(newName);
         if (newName) {
-            const updatedName = await RenameMap({variables: {id: _id, field: 'name', val: newName}});
+            const updatedName = await SetRegionField({variables: {id: _id, field: 'name', val: newName}});
             console.log('updatedName: ' + JSON.stringify(updatedName));
             await refetch();
         }
@@ -95,7 +95,7 @@ const Home = (props) => {
     // {{pathname: '/home', state: {user: location.state.user}}}
     return (
         props.user ? 
-        <WLayout WLayout='header' className='container-secondary'>
+        <WLayout wLayout='header' className='container-secondary'>
             <WLHeader>
                 <WNavbar color='colored'>
                     <ul>
@@ -124,9 +124,9 @@ const Home = (props) => {
                         <WLMain className='home-maps'>
                         {
                             maps.map((entry) => (
-                                <WRow className='map-entry'>
+                                <WRow className='map-entry' key={entry._id}>
                                     {
-                                        showEditMapId !== entry._id ? 
+                                        editMapId !== entry._id ? 
                                         <WCol size='8' className='map-name'>
                                             <WButton wType='texted'
                                                     className='create-map-btn'
@@ -162,7 +162,7 @@ const Home = (props) => {
                                     <WCol size='2' className='map-trash'>
                                         <WButton wType='texted'
                                                  hoverAnimation='darken'
-                                                 onClick={() => deleteMap(entry._id)}
+                                                 onClick={() => toggleShowDeleteMap(entry._id)}
                                         >
                                             <i className='material-icons small'>delete</i>
                                         </WButton>
@@ -187,14 +187,19 @@ const Home = (props) => {
             </WLMain>
 
             {
-                /* showDelete && (<DeleteModal isVisible={showDelete} delete={deleteMap}) */
+                deleteMapId && (<DeleteModal 
+                                 deletionId={deleteMapId} 
+                                 handleDelete={deleteMap}
+                                 label='Map' 
+                                 setShowDelete={toggleShowDeleteMap}/>)
             }
             {
                 showCreate && (<CreateMapModal 
                                 isVisible={showCreate} 
                                 toggleShowCreate={toggleShowCreate} 
                                 createMap={CreateMap}
-                                selectMap={selectMap} />)
+                                selectMap={selectMap}
+                                mapsLength={maps.length} />)
             }
 
         </WLayout>

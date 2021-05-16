@@ -3,7 +3,8 @@ import { WModal, WMHeader, WMMain, WButton, WInput } from 'wt-frontend';
 
 const CreateMapModal = (props) => {
 
-    const [input, setInput] = useState({ name: '', parent: '' });
+    // do index stuff in resolver
+    const [input, setInput] = useState({ _id: '', path: '', name: '', index: '' + props.mapsLength});
 
     const updateInput = (e) => {
         const { name, value } = e.target;
@@ -12,12 +13,14 @@ const CreateMapModal = (props) => {
     }
 
     const handleCreate = async (e) => {
+        console.log("hey!!!")
         if (!input['name']) {
             alert("Must fill out map name field");
             return
         }
         const { _, error, data } = await props.createMap({ variables: { subregion: input } });
         if (error) {
+            console.log('input: ' + JSON.stringify(input));
             console.log(error.message);
             return
         }
@@ -26,7 +29,7 @@ const CreateMapModal = (props) => {
             return
         }
         const mapId = data.addSubregion;
-        console.log(mapId);
+        console.log('mapId from handleCreate: ' + mapId);
         props.toggleShowCreate(false);
         props.selectMap(mapId);
     }
