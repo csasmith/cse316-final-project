@@ -3,7 +3,8 @@ import { NavLink, Redirect,
          useHistory, useParams }    from 'react-router-dom';
 import { WLayout, WLHeader, 
          WLMain, WNavbar, 
-         WNavItem, WButton, 
+         WNavItem, WButton,
+         WInput, 
          WRow, WCol}                from 'wt-frontend';
 import { ADD_SUBREGION,
          LOGOUT }                   from '../cache/mutations';
@@ -14,6 +15,18 @@ import { useMutation,
 
 const RegionEntry = (props) => {
 
+    const [editField, toggleEdit] = useState('');
+
+    const editRegionEntry = (e) => {
+        const _id = props.subregion._id;
+        const field = editField; // or editField
+        const oldValue = props.subregion[field];
+        const newValue = e.currentTarget.value;
+        if (newValue) {
+            props.editRegionEntry(_id, field, oldValue, newValue);
+        }
+        toggleEdit('');
+    }
 
     return (
         props.subregion._id ? 
@@ -26,16 +39,74 @@ const RegionEntry = (props) => {
                                  onClick={() => props.handleDeleteSubregion(props.subregion)}>
                             <i className='material-icons small'>close</i>
                         </WButton>
-                        <WButton wType='texted' className='table-link'
-                                 onClick={() => props.goToSubregion(props.subregion._id)}>
-                            {props.subregion.name}
+                        {
+                            editField !== 'name' ? 
+                            <WButton wType='texted' className='table-link'
+                                     onClick={() => props.goToSubregion(props.subregion._id)}>
+                                {props.subregion.name}
+                            </WButton> 
+                            :
+                            <WInput wType='outlined'
+                                    className='map-edit-name'
+                                    inputType='text'
+                                    name='name'
+                                    placeholderText='Enter Region Name'
+                                    barAnimation='left-to-right'
+                                    labelAnimation='shrink'
+                                    hoverAnimation='solid'
+                                    autoFocus={true}
+                                    onBlur={editRegionEntry}
+                            />
+                        }
+                        <WButton wType='texted' 
+                                 className='table-name-edit' 
+                                 onClick={(e) => toggleEdit('name')}>
+                            <i className='material-icons small'>edit</i>
                         </WButton>
                     </WCol>
                     <WCol className='table-col' size='4'>
-                        {props.subregion.capital}
+                        {
+                            editField !== 'capital' ? 
+                            <WButton wType='texted' 
+                                     className='table-col' 
+                                     onClick={() => toggleEdit('capital')}>
+                                {props.subregion.capital}
+                            </WButton>
+                            :
+                            <WInput wType='outlined'
+                                    className='map-edit-name'
+                                    inputType='text'
+                                    name='capital'
+                                    placeholderText='Enter Capital'
+                                    barAnimation='left-to-right'
+                                    labelAnimation='shrink'
+                                    hoverAnimation='solid'
+                                    autoFocus={true}
+                                    onBlur={editRegionEntry}
+                            />
+                        }
                     </WCol>
                     <WCol className='table-col' size='4'>
-                        {props.subregion.leader}
+                        {
+                            editField !== 'leader' ? 
+                            <WButton wType='texted' 
+                                     className='table-col' 
+                                     onClick={() => toggleEdit('leader')}>
+                                {props.subregion.leader}
+                            </WButton>
+                            :
+                            <WInput wType='outlined'
+                                    className='map-edit-name'
+                                    inputType='text'
+                                    name='leader'
+                                    placeholderText='Enter Leader'
+                                    barAnimation='left-to-right'
+                                    labelAnimation='shrink'
+                                    hoverAnimation='solid'
+                                    autoFocus={true}
+                                    onBlur={editRegionEntry}
+                            />
+                        }
                     </WCol>
                 </WRow>
             </WCol>

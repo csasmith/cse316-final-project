@@ -181,8 +181,7 @@ const Home = (props) => {
                                     <WCol size='2' className='map-edit'>
                                         <WButton wType='texted'
                                                  hoverAnimation='darken'
-                                                 onClick={() => toggleShowEditMap(entry._id)}
-                                        >
+                                                 onClick={() => toggleShowEditMap(entry._id)} >
                                             <i className='material-icons small'>edit</i>
                                         </WButton>
                                     </WCol>

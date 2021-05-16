@@ -101,6 +101,27 @@ export class EditItem_Transaction extends jsTPS_Transaction {
     }
 }
 
+export class EditRegion_Transaction extends jsTPS_Transaction {
+    constructor(_id, field, oldValue, newValue, updatefunc) {
+        super();
+        this._id = _id;
+        this.field = field;
+        this.oldValue = oldValue;
+        this.newValue = newValue;
+        this.updateField = updatefunc;
+    }
+
+    async doTransaction() {
+        const { data } = await this.updateField({ variables : { id: this._id, field: this.field, val: this.newValue } });
+        return data;
+    }
+
+    async undoTransaction() {
+        const { data } = await this.updateField({ variables: { id: this._id, field: this.field, val: this.oldValue } });
+        return data;
+    }
+}
+
 /* Add or Delete Subregions from sheet */
 export class AddDeleteSubregion_Transaction extends jsTPS_Transaction {
 

@@ -18,7 +18,7 @@ import { GET_REGION_BY_ID,
 import { useMutation,
          useQuery, 
          useApolloClient }                  from '@apollo/client';
-import { AddDeleteSubregion_Transaction }   from '../utils/jsTPS';
+import { AddDeleteSubregion_Transaction, EditRegion_Transaction }   from '../utils/jsTPS';
 
 const RegionSpreadSheet = (props) => {
 
@@ -67,7 +67,7 @@ const RegionSpreadSheet = (props) => {
     if (regionError) {console.log(regionError, 'error')};
     if (regionData) {
         region = regionData.getRegionById;
-        console.log("region: " + JSON.stringify(region));
+        // console.log("region: " + JSON.stringify(region));
     }
 
     /* gets all immediate child subregions for the sheet */ 
@@ -75,7 +75,7 @@ const RegionSpreadSheet = (props) => {
     if (subregionError) { console.log(subregionError, 'error')};
     if (subregionData) {
         subregions = subregionData.getSubregions;
-        console.log("subregions: " + JSON.stringify(subregions));
+        // console.log("subregions: " + JSON.stringify(subregions));
     }
 
 
@@ -134,6 +134,12 @@ const RegionSpreadSheet = (props) => {
         tps.addTransaction(transaction);
         tpsRedo();
         refetchSubregions(); // maybe this should be awaited 
+    }
+
+    const handleEditSubregion = (_id, field, oldValue, newValue) => {
+        let transaction = new EditRegion_Transaction(_id, field, oldValue, newValue, SetRegionField);
+        tps.addTransaction(transaction);
+        tpsRedo();
     }
 
     const goToAncestor = (entry) => {
@@ -283,6 +289,7 @@ const RegionSpreadSheet = (props) => {
                                                  goToSubregion={goToSubregion}
                                                  goToRegionView={goToRegionView}
                                                  handleDeleteSubregion={toggleShowDeleteRegion}
+                                                 editRegionEntry={handleEditSubregion}
                                                  key={subregion._id}/>
                                 ))
                                 :
