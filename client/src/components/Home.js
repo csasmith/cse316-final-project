@@ -25,7 +25,7 @@ const Home = (props) => {
     const [DeleteMap] = useMutation(DELETE_SUBREGION);
     const [SetRegionField] = useMutation(SET_REGION_FIELD);
     const client = useApolloClient();
-    const [deleteMapId, toggleShowDeleteMap] = useState(0);
+    const [mapToDelete, toggleShowDeleteMap] = useState(0);
     const [editMapId, toggleShowEditMap] = useState(-1);
     const [showCreate, toggleShowCreate] = useState(false);
     let history = useHistory();
@@ -40,28 +40,25 @@ const Home = (props) => {
     }
 
     const selectMap = async (id) => {
+        console.log('map got clicked');
         // swap indices of most recent and selected
-
-        const {_, error, data } = await refetch(); // refetch is useQuery(GET_MAPS)
-        if (error) {console.log(error.message)};
-        if (data) {
-            maps = data.getAllMaps;
-            if (maps.length > 1) {
-                const selectedMap = maps.find(map => map._id === id);
-                const mostRecentMap = maps.find(map => map.index === '0'); // should be same as maps[0]
-                const newSelectedIndex = await SetRegionField({variables: {id: selectedMap._id, field: 'index', val: mostRecentMap.index}});
-                const oldSelectedIndex = await SetRegionField({variables: {id: mostRecentMap._id, field: 'index', val: selectedMap.index}});
-            }
-            await refetch();
-            // console.log('Did the indices get swapped correctly? ' + JSON.stringify(data.getAllMaps));
+        if (maps.length > 1) {
+            const selectedMap = maps.find(map => map._id === id);
+            const mostRecentMap = maps.find(map => map.index === '0'); // should be same as maps[0]
+            const newSelectedIndex = await SetRegionField({variables: {id: selectedMap._id, field: 'index', val: mostRecentMap.index}});
+            const oldSelectedIndex = await SetRegionField({variables: {id: mostRecentMap._id, field: 'index', val: selectedMap.index}});
+        } else if (maps.length === 1) {
+            const selectedMap = maps.find(map => map._id === id);
+            const newSelectedIndex = await SetRegionField({variables: {id: selectedMap._id, field: 'index', val: '0'}});
         }
-
-        // history.push(`home/sheet/${id}`);
+        // console.log('Did the indices get swapped correctly? ' + JSON.stringify(data.getAllMaps));
+        props.sheetTps.clearAllTransactions();
+        history.push(`home/sheet/${id}`);
     }
 
 
-    const deleteMap = async (_id) => {
-        const deleted = await DeleteMap({ variables: { id: _id }});
+    const deleteMap = async (entry) => {
+        const deleted = await DeleteMap({ variables: { id: entry._id }});
         console.log('deleted map: ' + JSON.stringify(deleted));
         await refetch();
     }
@@ -162,7 +159,7 @@ const Home = (props) => {
                                     <WCol size='2' className='map-trash'>
                                         <WButton wType='texted'
                                                  hoverAnimation='darken'
-                                                 onClick={() => toggleShowDeleteMap(entry._id)}
+                                                 onClick={() => toggleShowDeleteMap(entry)}
                                         >
                                             <i className='material-icons small'>delete</i>
                                         </WButton>
@@ -187,8 +184,8 @@ const Home = (props) => {
             </WLMain>
 
             {
-                deleteMapId && (<DeleteModal 
-                                 deletionId={deleteMapId} 
+                mapToDelete && (<DeleteModal 
+                                 regionToDelete={mapToDelete} 
                                  handleDelete={deleteMap}
                                  label='Map' 
                                  setShowDelete={toggleShowDeleteMap}/>)

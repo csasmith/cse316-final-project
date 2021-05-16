@@ -4,7 +4,7 @@ import { WModal, WMHeader, WMMain, WButton } from 'wt-frontend';
 const DeleteModal = (props) => {
 
     const handleDelete = (e) => {
-        props.handleDelete(props.deletionId);
+        props.handleDelete(props.regionToDelete);
         props.setShowDelete(0); // consider making null instead of 0? nah overkill
     }
 

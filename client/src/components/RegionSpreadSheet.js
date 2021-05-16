@@ -1,4 +1,5 @@
-import React, { useState }          from 'react';
+import React, { useState,
+                useEffect }         from 'react';
 import RegionEntry                  from './RegionEntry';
 import { NavLink, Redirect,
          useHistory, useParams,
@@ -8,8 +9,10 @@ import { WLayout, WLHeader,
          WNavItem, WButton, 
          WRow, WCol}                from 'wt-frontend';
 import { ADD_SUBREGION,
-         LOGOUT }                   from '../cache/mutations';
-import { GET_REGION_BY_ID }         from '../cache/queries';
+         LOGOUT, 
+         SET_REGION_FIELD }         from '../cache/mutations';
+import { GET_REGION_BY_ID,
+         GET_SUBREGIONS }           from '../cache/queries';
 import { useMutation,
          useQuery, 
          useApolloClient }          from '@apollo/client';
@@ -18,34 +21,57 @@ const RegionSpreadSheet = (props) => {
 
     const [Logout] = useMutation(LOGOUT);
     const [AddSubregion] = useMutation(ADD_SUBREGION);
+    const [SetRegionField] = useMutation(SET_REGION_FIELD);
     const client = useApolloClient();
-    const [showDelete, toggleShowDelete] = useState(false);
-    const [deleteRegionId, setDeleteRegionId] = useState({});
-    let history = useHistory();
-    let location = useLocation();
-    let { id } = useParams();
-    let regionData = {};
-    let ancestors = location.state.ancestors; // [{id: id, name: name}]
-    console.log("ancestors: " + JSON.stringify(ancestors));
+    const history = useHistory();
+    const location = useLocation();
+    const { id } = useParams();
+    const [deleteRegionId, toggleShowDeleteRegion] = useState(0);
+    const [newIndex, setNewIndex] = useState(0);
+    let region = {};
+    let subregions = [];
+    const tps = props.sheetTps;
+    let ancestors = [];
 
-    const { _, error, data, refetch } = useQuery(GET_REGION_BY_ID, { variables : { id: id}, fetchPolicy: 'network-only' });
-    if (error) {console.log(error, 'error')};
-    if (data) {
-        regionData = data.getRegionById;
-        // console.log("regionData: " + JSON.stringify(regionData));
-        console.log('regionData.name: ' + regionData.name);
+    const { _, regionError, regionData, refetchRegion } = useQuery(GET_REGION_BY_ID, { variables : { id: id}, fetchPolicy: 'network-only' });
+    if (regionError) {console.log(regionError, 'error')};
+    if (regionData) {
+        region = regionData.getRegionById;
+        if (region.path) { ancestors = region.path.split(',').splice(0, 1) }; // remove empty string from first position
+        console.log("region: " + JSON.stringify(region));
     }
 
+    const { __, subregionError, subregionData } = useQuery(GET_SUBREGIONS, { variables: { id: id }, fetchPolicy: 'network-only'});
+    if (subregionError) { console.log(subregionError, 'error')};
+    if (subregionData) {
+        subregions = subregionData.getSubregions;
+        console.log("subregions: " + JSON.stringify(subregions));
+    }
+
+    // runs only once on first mount...
+    useEffect(() => {
+        tps.clearAllTransactions();
+        let maxIndex = -1;
+        if (subregions.length) { maxIndex = subregions.reduce( (accumulator, subregion) => Math.max(accumulator, subregion.index)) };
+        setNewIndex(maxIndex + 1);
+    }, []);
+
     const handleAddSubregion = async (e) => {
-        const {_, error, data } = await AddSubregion({ variables: { subregion: { name: "Untitled", parent: id } } });
+        const newSubregion = {
+            _id: '',
+            path: ',' + id,
+            name: 'Untitled',
+            index: newIndex
+        };
+        const {_, error, data } = await AddSubregion({ variables: { subregion: newSubregion } });
         if (error) {console.log(error, 'error')};
         if (data.addSubregion === 'Error:DB') {
             alert("Failed to save new region");
             return
         }
         const regionId = data.addSubregion;
-        console.log(regionId); 
-        await refetch();
+        console.log('new subregion id: ' + regionId); 
+        setNewIndex(newIndex + 1);
     }
 
     const goToAncestor = (entry) => {
@@ -55,14 +81,14 @@ const RegionSpreadSheet = (props) => {
     }
 
     const goToSubregion = async (subregionId) => {
-        ancestors.push({ id: id, name: regionData.name });
+        ancestors.push({ id: id, name: region.name });
         console.log('newAncestors: ' + JSON.stringify(ancestors));
-        await refetch({variables : { id: subregionId}});
+        await refetchRegion({variables : { id: subregionId}});
         history.push({ pathname: `/home/sheet/${subregionId}`, state: { ancestors: ancestors }});
     }
 
     const goToRegionView = (regionId) => {
-        ancestors.push({ id: id, name: regionData.name });
+        ancestors.push({ id: id, name: region.name });
         console.log('newAncestors: ' + JSON.stringify(ancestors));
         history.push({ pathname: `/home/view/${regionId}`, state: { ancestors: ancestors} });
     }
@@ -84,7 +110,7 @@ const RegionSpreadSheet = (props) => {
     // {{pathname: '/home', state: {user: location.state.user}}}
     return (
         props.user ? 
-        <WLayout WLayout='header' className='container-secondary'>
+        <WLayout wLayout='header' className='container-secondary'>
             <WLHeader>
                 <WNavbar color='colored'>
                     <ul className='toolbar-lside'>
@@ -136,7 +162,7 @@ const RegionSpreadSheet = (props) => {
                             <WButton className='sheet-redo' wType='texted'><i className='material-icons'>redo</i></WButton>
                         </WCol>
                         <WCol className='login-link' size='2'><h4>Region Name:</h4></WCol>
-                        <WCol size='2'><WButton wType='texted' className='main-region-name-link'>{regionData.name}</WButton></WCol>
+                        <WCol size='2'><WButton wType='texted' className='main-region-name-link'>{region.name}</WButton></WCol>
                     </WRow>
                     <WRow className='table-header'>
                         <WCol size='7'>
@@ -166,8 +192,8 @@ const RegionSpreadSheet = (props) => {
                     </WRow>
                     <WLMain className='table-entries'>
                         {
-                            regionData.subregions ? 
-                                regionData.subregions.map((subregion) => (
+                            region.subregions ? 
+                                region.subregions.map((subregion) => (
                                     <RegionEntry subregion={subregion}
                                                  goToSubregion={goToSubregion}
                                                  goToRegionView={goToRegionView}/>

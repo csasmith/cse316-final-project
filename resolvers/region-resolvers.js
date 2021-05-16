@@ -27,6 +27,17 @@ module.exports = {
                 return (region);
             }
             return ({});
+        },
+        getSubregions: async (_, args) => {
+            const { _id } = args;
+            const regexp = _id + '$'; // string ends with _id
+            console.log('regex for getSubregions: ' + regexp);
+            const subregions = await Region.find({ path: { $regex: regexp }});
+            console.log('subregions: ' + subregions);
+            if (subregions) {
+                return (subregions);
+            }
+            return ([]);
         }
     },
     Mutation: {

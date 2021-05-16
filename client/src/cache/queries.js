@@ -35,6 +35,21 @@ export const GET_REGION_BY_ID = gql`
 	}
 `;
 
+export const GET_SUBREGIONS = gql`
+	query GetSubregions($id: String!) {
+		getSubregions(_id: $id) {
+			_id
+			owner
+			path
+			name
+			capital
+			leader
+			landmarks
+			index
+		}
+	}
+`;
+
 // this seems like high trickery
 export const GET_CHILDREN_LANDMARKS = gql`
 	query GetChildrenLandmarks($id: String!) {

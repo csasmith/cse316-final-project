@@ -139,6 +139,21 @@ export class UpdateListItems_Transaction extends jsTPS_Transaction {
     }
 }
 
+export class CreateDeleteSubregion_Transaction extends jsTPS_Transaction {
+
+    constructor() {
+        super();
+    }
+
+    async doTransaction() {
+
+    }
+
+    async undoTransaction() {
+
+    }
+}
+
 
 
 

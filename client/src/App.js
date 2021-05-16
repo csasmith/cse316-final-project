@@ -14,7 +14,8 @@ import { BrowserRouter, Switch,
  
 const App = () => {
 	let user = null;
-    // let transactionStack = new jsTPS();
+    let sheetTps = new jsTPS();
+	let viewerTps = new jsTPS();
 	
     const { loading, error, data, refetch } = useQuery(queries.GET_USER, {fetchPolicy: 'network-only'});
 
@@ -45,10 +46,10 @@ const App = () => {
 					<Home fetchUser={refetch} user={user} />
 				</Route>
 				<Route path='/home/sheet/:id'>
-                    <RegionSpreadSheet fetchUser={refetch} user={user} />
+                    <RegionSpreadSheet fetchUser={refetch} user={user} sheetTps={sheetTps} />
                 </Route>
 				<Route path='/home/view/:id'>
-					<RegionViewer fetchuser={refetch} user={user} />
+					<RegionViewer fetchuser={refetch} user={user} viewerTps={viewerTps} />
 				</Route>
 			</Switch>
 		</BrowserRouter>
