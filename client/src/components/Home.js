@@ -27,7 +27,7 @@ const Home = (props) => {
     const [SetRegionField] = useMutation(SET_REGION_FIELD);
 
     /* state hooks */
-    const [mapToDelete, toggleShowDeleteMap] = useState(0);
+    const [mapToDelete, toggleShowDeleteMap] = useState(null);
     const [editMapId, toggleShowEditMap] = useState(-1);
     const [showCreate, toggleShowCreate] = useState(false);
 
@@ -66,18 +66,23 @@ const Home = (props) => {
     const selectMap = async (id) => {
         console.log('map got clicked');
         // swap indices of most recent and selected
-        if (maps.length > 1) {
-            const selectedMap = maps.find(map => map._id === id);
-            const mostRecentMap = maps.find(map => map.index === '0'); // should be same as maps[0]
-            const newSelectedIndex = await SetRegionField({variables: {id: selectedMap._id, field: 'index', val: mostRecentMap.index}});
-            const oldSelectedIndex = await SetRegionField({variables: {id: mostRecentMap._id, field: 'index', val: selectedMap.index}});
-        } else if (maps.length === 1) {
-            const selectedMap = maps.find(map => map._id === id);
-            const newSelectedIndex = await SetRegionField({variables: {id: selectedMap._id, field: 'index', val: '0'}});
+        const {_, error, data } = await refetch();
+        if (error) { console.log(error, 'error') };
+        if (data) {
+            maps = data.getAllMaps;
+            console.log(JSON.stringify(maps));
+            if (maps.length > 1) {
+                const selectedMap = maps.find(map => map._id === id);
+                const mostRecentMap = maps[0]; // maps.find(map => map.index === '0');
+                const newSelectedIndex = await SetRegionField({variables: {id: selectedMap._id, field: 'index', val: mostRecentMap.index}});
+                const oldSelectedIndex = await SetRegionField({variables: {id: mostRecentMap._id, field: 'index', val: selectedMap.index}});
+            }
+            await refetch();
+            // console.log('Did the indices get swapped correctly? ' + JSON.stringify(data.getAllMaps));
+            // history.push(`home/sheet/${id}`);
+            history.push({ pathname : `home/sheet/${id}`, state : { ancestors : [] } });
         }
-        // console.log('Did the indices get swapped correctly? ' + JSON.stringify(data.getAllMaps));
-        // history.push(`home/sheet/${id}`);
-        history.push({ pathname : `home/sheet/${id}`, state : { ancestors : [] } });
+        
     }
 
 
@@ -100,6 +105,7 @@ const Home = (props) => {
     }
 
     const handleLogout = async (e) => {
+        // props.logout();
         await Logout();
         const { _, error, data } = await props.fetchUser();
         if (error) {console.log(error.message)};
