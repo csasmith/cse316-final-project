@@ -32,7 +32,7 @@ module.exports = {
             const { _id } = args;
             const regexp = _id + '$'; // string ends with _id
             console.log('regex for getSubregions: ' + regexp);
-            const subregions = await Region.find({ path: { $regex: regexp }});
+            const subregions = await Region.find({ path: { $regex: regexp }}).sort({ index: 'asc' });
             console.log('subregions: ' + subregions);
             if (subregions) {
                 return (subregions);
@@ -72,8 +72,9 @@ module.exports = {
             const deletedDoc = await Region.findByIdAndDelete(objId);
             if (deletedDoc) {
                 console.log(deletedDoc);
+                return (deletedDoc);
             }
-            return objId;
+            return ([]);
         },
         changeSubregionParent: async (_, args) => {
             return "change subregion parent"

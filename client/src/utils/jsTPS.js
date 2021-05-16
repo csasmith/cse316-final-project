@@ -101,56 +101,34 @@ export class EditItem_Transaction extends jsTPS_Transaction {
     }
 }
 
-/*  Handles create/delete of list items */
-export class UpdateListItems_Transaction extends jsTPS_Transaction {
-    // opcodes: 0 - delete, 1 - add 
-    constructor(listID, itemID, item, opcode, addfunc, delfunc, index = -1) {
+/* Add or Delete Subregions from sheet */
+export class AddDeleteSubregion_Transaction extends jsTPS_Transaction {
+
+    constructor(subregion, flag, addfunc, deletefunc) {
         super();
-        this.listID = listID;
-		this.itemID = itemID;
-		this.item = item;
-        this.addFunction = addfunc;
-        this.deleteFunction = delfunc;
-        this.opcode = opcode;
-        this.index = index;
+        this.subregion = subregion;
+        this.flag = flag;
+        this.addSubregion = addfunc;
+        this.deleteSubregion = deletefunc;
     }
+
     async doTransaction() {
-		let data;
-        this.opcode === 0 ? { data } = await this.deleteFunction({
-							variables: {itemId: this.itemID, _id: this.listID}})
-						  : { data } = await this.addFunction({
-							variables: {item: this.item, _id: this.listID, index: this.index}})  
-		if(this.opcode !== 0) {
-            this.item._id = this.itemID = data.addItem;
-		}
-		return data;
-    }
-    // Since delete/add are opposites, flip matching opcode
-    async undoTransaction() {
-		let data;
-        this.opcode === 1 ? { data } = await this.deleteFunction({
-							variables: {itemId: this.itemID, _id: this.listID}})
-                          : { data } = await this.addFunction({
-							variables: {item: this.item, _id: this.listID, index: this.index}})
-		if(this.opcode !== 1) {
-            this.item._id = this.itemID = data.addItem;
+        let data;
+        if (this.flag === 'add') {
+            ({ data } = await this.addSubregion({ variables : { subregion : this.subregion } }));
+        } else {
+            ({ data } = await this.deleteSubregion({ variables : { id: this.subregion._id }}));
         }
-		return data;
-    }
-}
-
-export class CreateDeleteSubregion_Transaction extends jsTPS_Transaction {
-
-    constructor() {
-        super();
-    }
-
-    async doTransaction() {
-
+        return data;
     }
 
     async undoTransaction() {
-
+        let data;
+        if (this.flag === 'add') {
+            ({ data } = await this.deleteSubregion({ variables : { id: this.subregion._id }}));
+        } else {
+            ({ data } = await this.addSubregion({ variables : { subregion: this.subregion }}));
+        }
     }
 }
 

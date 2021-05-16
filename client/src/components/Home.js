@@ -20,17 +20,32 @@ import { useMutation,
 
 const Home = (props) => {
     
+    /* mutation hooks */
     const [Logout] = useMutation(LOGOUT);
     const [CreateMap] = useMutation(ADD_SUBREGION);
     const [DeleteMap] = useMutation(DELETE_SUBREGION);
     const [SetRegionField] = useMutation(SET_REGION_FIELD);
-    const client = useApolloClient();
+
+    /* state hooks */
     const [mapToDelete, toggleShowDeleteMap] = useState(0);
     const [editMapId, toggleShowEditMap] = useState(-1);
     const [showCreate, toggleShowCreate] = useState(false);
+
+    /* misc hooks */
+    const client = useApolloClient();
     let history = useHistory();
     let location = useLocation();
+
+    /* our vars */
     let maps = [];
+
+
+    /**
+     * 
+     * INITIALIZATION
+     * 
+     */
+
 
     const { _, error, data, refetch } = useQuery(GET_MAPS);
     if (error) {console.log(error.message)};
@@ -39,6 +54,15 @@ const Home = (props) => {
         // console.log('All maps on render: ' + JSON.stringify(maps));
     }
 
+
+    /**
+     * 
+     * HANDLER FUNCTIONS
+     * 
+     */
+
+
+    /* move chosen map to top and go to spreadsheet */
     const selectMap = async (id) => {
         console.log('map got clicked');
         // swap indices of most recent and selected
@@ -52,8 +76,8 @@ const Home = (props) => {
             const newSelectedIndex = await SetRegionField({variables: {id: selectedMap._id, field: 'index', val: '0'}});
         }
         // console.log('Did the indices get swapped correctly? ' + JSON.stringify(data.getAllMaps));
-        props.sheetTps.clearAllTransactions();
-        history.push(`home/sheet/${id}`);
+        // history.push(`home/sheet/${id}`);
+        history.push({ pathname : `home/sheet/${id}`, state : { ancestors : [] } });
     }
 
 

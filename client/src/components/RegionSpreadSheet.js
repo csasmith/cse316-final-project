@@ -1,96 +1,135 @@
 import React, { useState,
-                useEffect }         from 'react';
-import RegionEntry                  from './RegionEntry';
+                useEffect }                 from 'react';
+import RegionEntry                          from './RegionEntry';
 import { NavLink, Redirect,
          useHistory, useParams,
-         useLocation }              from 'react-router-dom';
+         useLocation }                      from 'react-router-dom';
 import { WLayout, WLHeader, 
          WLMain, WNavbar, 
          WNavItem, WButton, 
-         WRow, WCol}                from 'wt-frontend';
+         WRow, WCol}                        from 'wt-frontend';
 import { ADD_SUBREGION,
          LOGOUT, 
-         SET_REGION_FIELD }         from '../cache/mutations';
+         DELETE_SUBREGION,
+         SET_REGION_FIELD }                 from '../cache/mutations';
 import { GET_REGION_BY_ID,
-         GET_SUBREGIONS }           from '../cache/queries';
+         GET_SUBREGIONS }                   from '../cache/queries';
 import { useMutation,
          useQuery, 
-         useApolloClient }          from '@apollo/client';
+         useApolloClient }                  from '@apollo/client';
+import { AddDeleteSubregion_Transaction }   from '../utils/jsTPS';
 
 const RegionSpreadSheet = (props) => {
 
+    /* mutation hooks */
     const [Logout] = useMutation(LOGOUT);
     const [AddSubregion] = useMutation(ADD_SUBREGION);
+    const [DeleteSubregion] = useMutation(DELETE_SUBREGION);
     const [SetRegionField] = useMutation(SET_REGION_FIELD);
+
+    /* state hooks */
+    const [deleteRegionId, toggleShowDeleteRegion] = useState(0);
+    const [newIndex, setNewIndex] = useState(0);
+
+    /* misc hooks */
     const client = useApolloClient();
     const history = useHistory();
     const location = useLocation();
     const { id } = useParams();
-    const [deleteRegionId, toggleShowDeleteRegion] = useState(0);
-    const [newIndex, setNewIndex] = useState(0);
+
+    /* our vars */
     let region = {};
     let subregions = [];
     const tps = props.sheetTps;
-    let ancestors = [];
+    let ancestors = location.state.ancestors;
 
-    const { _, regionError, regionData, refetchRegion } = useQuery(GET_REGION_BY_ID, { variables : { id: id}, fetchPolicy: 'network-only' });
+
+    /**
+     * 
+     * INITIALIZATION
+     * 
+     */
+
+
+    /* runs only once on first mount... supposedly */
+    useEffect(() => {
+        tps.clearAllTransactions();
+        let maxIndex = -1;
+        // can see potential issue where if this runs before first render subregions.length === 0 always
+        if (subregions.length) { maxIndex = subregions.reduce( (accumulator, subregion) => Math.max(accumulator, subregion.index)) };
+        setNewIndex(maxIndex + 1);
+    }, []);
+
+    /* gets parent region */
+    const { _, error: regionError, data: regionData, refetch: refetchRegion } = useQuery(GET_REGION_BY_ID, { variables : { id: id}, fetchPolicy: 'network-only' });
     if (regionError) {console.log(regionError, 'error')};
     if (regionData) {
         region = regionData.getRegionById;
-        if (region.path) { ancestors = region.path.split(',').splice(0, 1) }; // remove empty string from first position
         console.log("region: " + JSON.stringify(region));
     }
 
-    const { __, subregionError, subregionData } = useQuery(GET_SUBREGIONS, { variables: { id: id }, fetchPolicy: 'network-only'});
+    /* gets all immediate child subregions for the sheet */ 
+    const { __, error: subregionError, data: subregionData, refetch: refetchSubregions } = useQuery(GET_SUBREGIONS, { variables: { id: id }, fetchPolicy: 'network-only'});
     if (subregionError) { console.log(subregionError, 'error')};
     if (subregionData) {
         subregions = subregionData.getSubregions;
         console.log("subregions: " + JSON.stringify(subregions));
     }
 
-    // runs only once on first mount...
-    useEffect(() => {
-        tps.clearAllTransactions();
-        let maxIndex = -1;
-        if (subregions.length) { maxIndex = subregions.reduce( (accumulator, subregion) => Math.max(accumulator, subregion.index)) };
-        setNewIndex(maxIndex + 1);
-    }, []);
 
-    const handleAddSubregion = async (e) => {
+    /**
+     * 
+     * HANDLER FUNCTIONS
+     * 
+     */
+
+
+    /* tps redo */
+    const tpsRedo = async () => {
+        const retval = await tps.doTransaction();
+        await refetchSubregions();
+        return retval;
+    }
+
+    /* tps undo */
+    const tpsUndo = async () => {
+        const retval = await tps.undoTransaction();
+        await refetchSubregions();
+        return retval;
+    }
+
+
+    /* Add new untitled subregion */
+    const handleAddSubregion = (e) => { // does this actually have to be async?
         const newSubregion = {
             _id: '',
-            path: ',' + id,
+            path: region.path ? region.path + ',' + id : ',' + id,
             name: 'Untitled',
-            index: newIndex
+            index: '' + newIndex
         };
-        const {_, error, data } = await AddSubregion({ variables: { subregion: newSubregion } });
-        if (error) {console.log(error, 'error')};
-        if (data.addSubregion === 'Error:DB') {
-            alert("Failed to save new region");
-            return
-        }
-        const regionId = data.addSubregion;
-        console.log('new subregion id: ' + regionId); 
+        let transaction = new AddDeleteSubregion_Transaction(newSubregion, 'add', AddSubregion, DeleteSubregion);
+        tps.addTransaction(transaction);
+        tpsRedo();
         setNewIndex(newIndex + 1);
     }
 
     const goToAncestor = (entry) => {
         ancestors.splice(ancestors.indexOf(entry));
         console.log('newAncestors: ' + JSON.stringify(ancestors));
-        history.push({ pathname: `/home/sheet/${entry.id}`, state: { ancestors: ancestors }});
+        history.push({ pathname: `/home/sheet/${entry._id}`, state: { ancestors: ancestors }});
     }
 
     const goToSubregion = async (subregionId) => {
-        ancestors.push({ id: id, name: region.name });
+        ancestors.push({ _id: id, name: region.name });
         console.log('newAncestors: ' + JSON.stringify(ancestors));
-        await refetchRegion({variables : { id: subregionId}});
+        // await refetchRegion({variables : { id: subregionId}});
         history.push({ pathname: `/home/sheet/${subregionId}`, state: { ancestors: ancestors }});
     }
 
     const goToRegionView = (regionId) => {
-        ancestors.push({ id: id, name: region.name });
+        ancestors.push({ _id: id, name: region.name });
         console.log('newAncestors: ' + JSON.stringify(ancestors));
-        history.push({ pathname: `/home/view/${regionId}`, state: { ancestors: ancestors} });
+        history.push({ pathname: `/home/view/${regionId}`, state: { ancestors: ancestors } });
     }
 
     const handleLogout = async (e) => {
@@ -192,8 +231,8 @@ const RegionSpreadSheet = (props) => {
                     </WRow>
                     <WLMain className='table-entries'>
                         {
-                            region.subregions ? 
-                                region.subregions.map((subregion) => (
+                            subregions ? 
+                                subregions.map((subregion) => (
                                     <RegionEntry subregion={subregion}
                                                  goToSubregion={goToSubregion}
                                                  goToRegionView={goToRegionView}/>
@@ -208,7 +247,9 @@ const RegionSpreadSheet = (props) => {
                 /* showDelete && (<DeleteModal isVisible={showDelete} delete={deleteMap}) */
             }
         </WLayout>
+
         : 
+
         <Redirect to='/login' />
     );
 }
