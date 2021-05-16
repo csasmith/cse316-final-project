@@ -6,7 +6,7 @@ import { WLayout, WLHeader,
 
 const Welcome = () => {
     return (
-        <WLayout WLayout='header' className='container-secondary'>
+        <WLayout wLayout='header' className='container-secondary'>
             <WLHeader>
                 <WNavbar color='colored'>
                     <ul>
