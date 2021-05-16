@@ -111,6 +111,14 @@ const RegionSpreadSheet = (props) => {
         tps.addTransaction(transaction);
         tpsRedo();
         setNewIndex(newIndex + 1);
+        // maybe we should refetch subregions here instead of depending on render to do it?
+    }
+
+    const handleDeleteSubregion = (subregion) => { // maybe this should be async
+        let transaction = new AddDeleteSubregion_Transaction(subregion, 'delete', AddSubregion, DeleteSubregion);
+        tps.addTransaction(transaction);
+        tpsRedo();
+        refetchSubregions(); // maybe this should be awaited 
     }
 
     const goToAncestor = (entry) => {
@@ -133,6 +141,7 @@ const RegionSpreadSheet = (props) => {
     }
 
     const handleLogout = async (e) => {
+        // props.logout();
         await Logout();
         const { _, error, data } = await props.fetchUser();
         if (error) {console.log(error, 'error')};
@@ -186,6 +195,7 @@ const RegionSpreadSheet = (props) => {
                     </ul>
                 </WNavbar>
             </WLHeader>
+
             <WLMain className='main'>
                 <WLMain className='sheet-container'>
                     <WRow className='table-controls'>
@@ -197,8 +207,18 @@ const RegionSpreadSheet = (props) => {
                             </WButton>
                         </WCol>
                         <WCol size='3'>
-                            <WButton className='sheet-undo' wType='texted'><i className='material-icons'>undo</i></WButton>
-                            <WButton className='sheet-redo' wType='texted'><i className='material-icons'>redo</i></WButton>
+                            <WButton className='sheet-undo' 
+                                     wType='texted' 
+                                     disabled={!tps.hasTransactionToUndo()}
+                                     onClick={tpsUndo}>
+                                <i className='material-icons'>undo</i>
+                            </WButton>
+                            <WButton className='sheet-redo' 
+                                     wType='texted' 
+                                     disabled={!tps.hasTransactionToRedo()}
+                                     onClick={tpsRedo}> 
+                                <i className='material-icons'>redo</i>
+                            </WButton>
                         </WCol>
                         <WCol className='login-link' size='2'><h4>Region Name:</h4></WCol>
                         <WCol size='2'><WButton wType='texted' className='main-region-name-link'>{region.name}</WButton></WCol>
@@ -235,7 +255,9 @@ const RegionSpreadSheet = (props) => {
                                 subregions.map((subregion) => (
                                     <RegionEntry subregion={subregion}
                                                  goToSubregion={goToSubregion}
-                                                 goToRegionView={goToRegionView}/>
+                                                 goToRegionView={goToRegionView}
+                                                 deleteSubregion={handleDeleteSubregion}
+                                                 key={subregion._id}/>
                                 ))
                                 :
                                 null

@@ -116,6 +116,7 @@ export class AddDeleteSubregion_Transaction extends jsTPS_Transaction {
         let data;
         if (this.flag === 'add') {
             ({ data } = await this.addSubregion({ variables : { subregion : this.subregion } }));
+            this.subregion._id = data.addSubregion;
         } else {
             ({ data } = await this.deleteSubregion({ variables : { id: this.subregion._id }}));
         }

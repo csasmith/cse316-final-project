@@ -11,7 +11,7 @@ module.exports = {
             const userId = new ObjectId(req.userId);
             console.log("userId: " + userId);
             if (!userId) return ({});
-            const maps = await Region.find({ owner: userId, path: '' }).sort({ index: 'asc'}); // might mess with required bit
+            const maps = await Region.find({ owner: userId, path: null }).sort({ index: 'asc'}); // might mess with required bit
             // console.log("maps: " + maps);
             if (maps) return maps;
             return ({});
@@ -82,7 +82,7 @@ module.exports = {
         setRegionField: async (_, args) => {
             const { _id, field, val } = args;
             console.log(_id, field, val);
-            let objId = new ObjectId(_id);
+            let objId = ObjectId(_id);
             const updatedDoc = await Region.findByIdAndUpdate(objId, { [field]: val });
             console.log(updatedDoc);
             return val;

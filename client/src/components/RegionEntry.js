@@ -21,7 +21,11 @@ const RegionEntry = (props) => {
             <WCol size='7'>
                 <WRow className='table-header-row'>
                     <WCol className='table-col' size='4'>
-                        <WButton className='delete-table-entry-btn' wType='texted' ><i className='material-icons small'>close</i></WButton>
+                        <WButton className='delete-table-entry-btn' 
+                                 wType='texted' 
+                                 onClick={() => props.deleteSubregion(props.subregion)}>
+                            <i className='material-icons small'>close</i>
+                        </WButton>
                         <WButton wType='texted' className='table-link'
                                  onClick={() => props.goToSubregion(props.subregion._id)}>
                             {props.subregion.name}
@@ -45,7 +49,7 @@ const RegionEntry = (props) => {
                 </WButton>
             </WCol>
         </WRow>
-        
+
         : null
     )
 }
