@@ -1,4 +1,4 @@
-import React, { useState }              from 'react';
+import React, { useState, useEffect }   from 'react';
 import { NavLink, useHistory }          from 'react-router-dom';
 import { WLayout, WLHeader, 
          WLMain, WNavbar,
@@ -25,7 +25,6 @@ const Login = (props) => {
                 return
             }
         }
-        await props.fetchUser();
         const { _, error, data } = await Login({ variables: { ...input } });
         if (error) { return `Error: ${error.message}` };
         if (data.login._id === null) {

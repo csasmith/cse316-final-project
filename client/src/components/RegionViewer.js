@@ -38,6 +38,7 @@ const RegionViewer = (props) => {
     }
 
     const handleLogout = async (e) => {
+        // props.logout();
         await Logout();
         const { _, error, data } = await props.fetchUser();
         if (error) {console.log(error, 'error')};
