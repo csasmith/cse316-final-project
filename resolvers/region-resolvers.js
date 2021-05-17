@@ -22,7 +22,7 @@ module.exports = {
             // console.log("what is id? :" + JSON.stringify(_id));
 			const objId = new ObjectId(_id);
             const region = await Region.findOne({ _id: objId });
-            // console.log("what is region? " + JSON.stringify(region));
+            console.log('region: ' + region);
             if (region) {
                 return (region);
             }
@@ -36,6 +36,16 @@ module.exports = {
             console.log('subregions: ' + subregions);
             if (subregions) {
                 return (subregions);
+            }
+            return ([]);
+        },
+        getAllSubregions: async (_, args) => {
+            const { _id } = args;
+            const regexp = '' + _id;
+            const allSubregions = await Region.find({ path: { $regex: regexp } }).sort({ path: 'asc' });
+            console.log('all subregions: ' + allSubregions);
+            if (allSubregions) {
+                return (allSubregions);
             }
             return ([]);
         }
@@ -81,9 +91,14 @@ module.exports = {
         },
         setRegionField: async (_, args) => {
             const { _id, field, val } = args;
-            console.log(_id, field, val);
+            console.log('set region field args: ' + _id, field, val);
             let objId = ObjectId(_id);
-            const updatedDoc = await Region.findByIdAndUpdate(objId, { [field]: val });
+            let newValue = val;
+            if (field === 'landmarks') {
+                newValue = val.split(',');
+                console.log('landmarks new value: ' + newValue);
+            }
+            const updatedDoc = await Region.findByIdAndUpdate(objId, { [field]: newValue });
             console.log(updatedDoc);
             return val;
         }

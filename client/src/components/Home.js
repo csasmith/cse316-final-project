@@ -64,13 +64,12 @@ const Home = (props) => {
 
     /* move chosen map to top and go to spreadsheet */
     const selectMap = async (id) => {
-        console.log('map got clicked');
         // swap indices of most recent and selected
         const {_, error, data } = await refetch();
         if (error) { console.log(error, 'error') };
         if (data) {
             maps = data.getAllMaps;
-            console.log(JSON.stringify(maps));
+            // console.log(JSON.stringify(maps));
             if (maps.length > 1) {
                 const selectedMap = maps.find(map => map._id === id);
                 const mostRecentMap = maps[0]; // maps.find(map => map.index === '0');

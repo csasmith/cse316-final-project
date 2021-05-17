@@ -50,15 +50,17 @@ export const GET_SUBREGIONS = gql`
 	}
 `;
 
-// this seems like high trickery
-export const GET_CHILDREN_LANDMARKS = gql`
-	query GetChildrenLandmarks($id: String!) {
-		getChildrenLandmarks(_id: $id)
-	}
-`;
-
-export const GET_THIS_REGION_LANDMARKS = gql`
-	query GetThisRegionLandmarks($id: String) {
-		getThisRegionLandmarks(_id: $id)
+export const GET_ALL_SUBREGIONS = gql`
+	query GetAllSubregions($id: String!) {
+		getAllSubregions(_id: $id) {
+			_id
+			owner
+			path
+			name
+			capital
+			leader
+			landmarks
+			index
+		}
 	}
 `;

@@ -27,10 +27,10 @@ const App = () => {
     let sheetTps = new jsTPS();
 	let viewerTps = new jsTPS();
 	
-    const { loading, error, data, refetch } = useQuery(queries.GET_USER, {fetchPolicy: 'network-only'});
+    const { loading, error, data, refetch } = useQuery(queries.GET_USER, {fetchPolicy: 'no-cache', notifyOnNetworkStatusChange: true});
 
-    if(error) { console.log(error); }
-	if(loading) { console.log(loading); }
+    if(error) { console.log(error) };
+	if(loading) { console.log(loading, 'user loading') };
 	if(data) { 
 		let { getCurrentUser } = data;
 		if(getCurrentUser !== null) { user = getCurrentUser; }

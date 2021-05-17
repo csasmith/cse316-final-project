@@ -7,19 +7,23 @@ import { WLayout, WLHeader,
          WLMain, WNavbar, 
          WNavItem, WButton, 
          WRow, WCol, WInput}        from 'wt-frontend';
-import { LOGOUT }                   from '../cache/mutations';
+import { SET_REGION_FIELD,
+         LOGOUT }                   from '../cache/mutations';
 import { GET_ALL_SUBREGIONS,
          GET_REGION_BY_ID }         from '../cache/queries';
 import { useMutation,
          useQuery, 
          useApolloClient }          from '@apollo/client';
+import { EditRegion_Transaction } from '../utils/jsTPS';
 
 const RegionViewer = (props) => {
 
     /* mutation hooks */
     const [Logout] = useMutation(LOGOUT);
+    const [SetRegionField] = useMutation(SET_REGION_FIELD);
 
     /* state hooks */
+    const [input, setInput] = useState('');
     const [tpsMutex, toggleMutex] = useState(false);
 
     /* misc hooks */
@@ -30,8 +34,6 @@ const RegionViewer = (props) => {
 
     /* our vars */
     const tps = props.viewerTps;
-    let region = {};
-    let allSubregions = [];
     let ancestors = location.state.ancestors;
     let siblings = location.state.siblings;
     let leftSibling = siblings.find((_, i, arr) => {
@@ -40,8 +42,10 @@ const RegionViewer = (props) => {
     let rightSibling = siblings.find((_, i, arr) => {
         return (i > 0 && arr[i-1]._id === id)
     });
-    console.log('left: ' + JSON.stringify(leftSibling));
-    console.log('right: ' + JSON.stringify(rightSibling));
+    // console.log('left: ' + JSON.stringify(leftSibling));
+    // console.log('right: ' + JSON.stringify(rightSibling));
+    let region = siblings.find((reg) => reg._id === id);
+    let allSubregions = [];
 
 
     /**
@@ -57,8 +61,9 @@ const RegionViewer = (props) => {
     }, []);
     
     /* get parent region info */ 
-    const { _, error, data, refetch } = useQuery(GET_REGION_BY_ID, { variables : { id: id}, fetchPolicy: 'network-only' });
-    if (error) {console.log(error, 'error')};
+    const { loading, error, data, refetch } = useQuery(GET_REGION_BY_ID, { variables : { id: id}, notifyOnNetworkStatusChange: true });
+    if (loading) {console.log(loading, 'get region loading')};
+    if (error) {console.log(error, 'get region error')};
     if (data) {
         region = data.getRegionById;
         // console.log("region: " + JSON.stringify(region));
@@ -66,10 +71,12 @@ const RegionViewer = (props) => {
     }
 
     /* get ALL subregions */
-    const { __, error: subregionError, data: subregionData, refetch: refetchAllSubregions } = useQuery(GET_ALL_SUBREGIONS, { variables: { id: id }, fetchPolicy: 'network-only'});
-    if (subregionError) { console.log(error, 'error')};
+    const { loading: subregionLoading, error: subregionError, data: subregionData, refetch: refetchAllSubregions } = useQuery(GET_ALL_SUBREGIONS, { variables: { id: id }, notifyOnNetworkStatusChange: true});
+    if (subregionLoading) { console.log(subregionLoading, 'subregions loading')};
+    if (subregionError) { console.log(subregionError, 'subregion error')};
     if (subregionData) {
         allSubregions = subregionData.getAllSubregions;
+        // console.log('ALL subregions: ' + JSON.stringify(allSubregions));
     }
 
 
@@ -85,7 +92,7 @@ const RegionViewer = (props) => {
         if (!tpsMutex) {
             toggleMutex(true); // idk why this works because async function...
             const retval = await tps.doTransaction();
-            await refetchAllSubregions();
+            await refetch();
             toggleMutex(false);
             return retval;
         }
@@ -97,9 +104,28 @@ const RegionViewer = (props) => {
         if (!tpsMutex) {
             toggleMutex(true);
             const retval = await tps.undoTransaction();
-            await refetchAllSubregions();
+            await refetch();
             toggleMutex(false);
             return retval;
+        }
+    }
+
+    const updateInput = (e) => {
+        console.log('landmark input: ' + e.target.value);
+        setInput(e.target.value);
+    }
+
+    const handleAddLandmark = async () => {
+        if (input) {
+            const oldValue = region.landmarks;
+            let newValue = region.landmarks.slice();
+            newValue.push(input);
+            newValue = newValue.join();
+            console.log(newValue);
+            let transaction = new EditRegion_Transaction(id, 'landmarks', oldValue, newValue, SetRegionField);
+            tps.addTransaction(transaction);
+            setInput('');
+            tpsRedo();
         }
     }
     
@@ -192,46 +218,97 @@ const RegionViewer = (props) => {
                     </WRow>
                     <WRow><img src='/flag.jpg' alt='flag' width='200' height='200'></img></WRow>
                     <WRow>
-                        <WCol size='6'>Region Name:</WCol>
-                        <WCol size='6'>{region.name}</WCol>
+                        <WCol size='5'>Region Name:</WCol>
+                        <WCol size='5'>{region.name}</WCol>
                     </WRow>
                     <WRow>
-                        <WCol size='6'>Parent Region: </WCol>
-                        <WCol size='6'>
+                        <WCol size='5'>Parent Region: </WCol>
+                        <WCol size='4'>
                             <WButton className='parent-region-link table-link' wType='texted'
-                                    onClick={() => goToAncestor({id: ancestors[ancestors.length - 1].id, name: ancestors[ancestors.length - 1].name})}>
+                                    onClick={() => goToAncestor({_id: ancestors[ancestors.length - 1]._id, name: ancestors[ancestors.length - 1].name})}>
                                 {ancestors[ancestors.length - 1].name}
+                            </WButton>
+                        </WCol>
+                        <WCol size='2'>
+                            <WButton className='parent-region-link' wType='texted' 
+                                    onClick={() => {console.log('change parent stub')}}>
+                                <i className='material-icons small'>edit</i>
                             </WButton>
                         </WCol>
                     </WRow>
                     <WRow>
-                        <WCol size='6'>Region Capital:</WCol>
-                        <WCol size='6'>{region.capital}</WCol>
+                        <WCol size='5'>Region Capital:</WCol>
+                        <WCol size='5'>{region.capital}</WCol>
                     </WRow>
                     <WRow>
-                        <WCol size='6'>Region Leader:</WCol>
-                        <WCol size='6'>{region.leader}</WCol>
+                        <WCol size='5'>Region Leader:</WCol>
+                        <WCol size='5'>{region.leader}</WCol>
                     </WRow>
                     <WRow>
-                        <WCol size='6'>Number of Subregions:</WCol>
-                        <WCol size='6'>{allSubregions ? allSubregions.length : 0}</WCol>
+                        <WCol size='5'>Number of Subregions:</WCol>
+                        <WCol size='5'>{allSubregions ? allSubregions.length : 0}</WCol>
                     </WRow>
                 </WLMain>
                 <WLMain className='viewer viewer-rside'>
                     <div>Region Landmarks</div>
-                    <WLMain className='landmarks-editor'></WLMain>
+                    <WLMain className='landmarks-editor'>
+                        {
+                            region.landmarks.length ? 
+                            region.landmarks.map((landmark, index) => (
+                                <WRow key={region._id + index} 
+                                        className='landmark-row'>
+                                    <WCol size='2'>
+                                        <WButton>
+                                            <i className='material-icons small'>close</i>
+                                        </WButton>
+                                    </WCol>
+                                    <WCol size='10'>
+                                        {landmark}
+                                    </WCol>
+                                </WRow>
+                            ))
+                            :
+                            null
+                        }
+                        {
+                            allSubregions ? 
+                            allSubregions.map((subregion) => (
+                                subregion.landmarks.length ? 
+                                subregion.landmarks.map((landmark, index) => (
+                                    <WRow key={subregion._id + index} 
+                                        className='landmark-row'>
+                                        <WCol size='2'>
+
+                                        </WCol>
+                                        <WCol size='10'>
+                                            {`${landmark} - ${subregion.name}`}
+                                        </WCol>
+                                    </WRow>
+                                ))
+                                :
+                                null
+                            ))
+                            :
+                            null 
+                        }
+                    </WLMain>
                     <WRow className='input-landmark'>
                         <WCol size='1'>
-                            <WButton className='add-region-btn add-landmark-btn' wType='texted'><i className='material-icons small'>add</i></WButton>
+                            <WButton className='add-region-btn add-landmark-btn' 
+                                     wType='texted'
+                                     onClick={handleAddLandmark}>
+                                <i className='material-icons small'>add</i>
+                            </WButton>
                         </WCol>
                         <WCol size='11'>
                         <WInput wType='outlined'
                                 inputType='text'
-                                name='name'
+                                id='newlandmark'
                                 placeholderText='Add New Landmark'
                                 barAnimation='left-to-right'
                                 labelAnimation='shrink'
                                 hoverAnimation='solid'
+                                onBlur={updateInput}
                         />
                         </WCol>
                     </WRow>

@@ -157,7 +157,7 @@ const RegionSpreadSheet = (props) => {
 
     const goToRegionView = (regionId) => {
         ancestors.push({ _id: id, name: region.name });
-        console.log('newAncestors: ' + JSON.stringify(ancestors));
+        // console.log('newAncestors: ' + JSON.stringify(ancestors));
         history.push({ pathname: `/home/view/${regionId}`, state: { ancestors: ancestors, siblings: subregions } });
     }
 

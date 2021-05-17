@@ -32,7 +32,7 @@ const Login = (props) => {
             return
         }
         if (data) {
-            console.log("data: " + JSON.stringify(data));
+            // console.log("data: " + JSON.stringify(data));
             const user = await props.fetchUser() // why are we not passing data.user or something?
             // history.push({ pathname: '/home', state: {user: data.login}});
             history.push('/home');
