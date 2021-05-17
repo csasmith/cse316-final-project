@@ -1,4 +1,5 @@
-import React, { useState }          from 'react';
+import React, { useState, 
+                useEffect }         from 'react';
 import { NavLink, Redirect,
          useHistory, useParams,
          useLocation }              from 'react-router-dom';
@@ -7,34 +8,113 @@ import { WLayout, WLHeader,
          WNavItem, WButton, 
          WRow, WCol, WInput}        from 'wt-frontend';
 import { LOGOUT }                   from '../cache/mutations';
-import { GET_REGION_BY_ID }         from '../cache/queries';
+import { GET_ALL_SUBREGIONS,
+         GET_REGION_BY_ID }         from '../cache/queries';
 import { useMutation,
          useQuery, 
          useApolloClient }          from '@apollo/client';
 
 const RegionViewer = (props) => {
 
+    /* mutation hooks */
     const [Logout] = useMutation(LOGOUT);
+
+    /* state hooks */
+    const [tpsMutex, toggleMutex] = useState(false);
+
+    /* misc hooks */
     const client = useApolloClient();
     let history = useHistory();
     let location = useLocation();
     let { id } = useParams();
-    let regionData = {};
-    let ancestors = location.state.ancestors; // [{id: id, name: name}]
-    console.log("ancestors: " + JSON.stringify(ancestors));
 
+    /* our vars */
+    const tps = props.viewerTps;
+    let region = {};
+    let allSubregions = [];
+    let ancestors = location.state.ancestors;
+    let siblings = location.state.siblings;
+    let leftSibling = siblings.find((_, i, arr) => {
+        return (i < (arr.length - 1) && arr[i+1]._id === id)
+    });
+    let rightSibling = siblings.find((_, i, arr) => {
+        return (i > 0 && arr[i-1]._id === id)
+    });
+    console.log('left: ' + JSON.stringify(leftSibling));
+    console.log('right: ' + JSON.stringify(rightSibling));
+
+
+    /**
+     * 
+     * INITIALIZATION
+     * 
+     */
+
+
+    /* runs once on mount */
+    useEffect(() => {
+        tps.clearAllTransactions();
+    }, []);
+    
+    /* get parent region info */ 
     const { _, error, data, refetch } = useQuery(GET_REGION_BY_ID, { variables : { id: id}, fetchPolicy: 'network-only' });
     if (error) {console.log(error, 'error')};
     if (data) {
-        regionData = data.getRegionById;
-        // console.log("regionData: " + JSON.stringify(regionData));
-        console.log('regionData.name: ' + regionData.name);
+        region = data.getRegionById;
+        // console.log("region: " + JSON.stringify(region));
+        console.log('region.name: ' + region.name);
     }
 
+    /* get ALL subregions */
+    const { __, error: subregionError, data: subregionData, refetch: refetchAllSubregions } = useQuery(GET_ALL_SUBREGIONS, { variables: { id: id }, fetchPolicy: 'network-only'});
+    if (subregionError) { console.log(error, 'error')};
+    if (subregionData) {
+        allSubregions = subregionData.getAllSubregions;
+    }
+
+
+    /**
+     * 
+     * HANDLER FUNCTIONS
+     * 
+     */
+
+
+    /* tps redo */
+    const tpsRedo = async () => {
+        if (!tpsMutex) {
+            toggleMutex(true); // idk why this works because async function...
+            const retval = await tps.doTransaction();
+            await refetchAllSubregions();
+            toggleMutex(false);
+            return retval;
+        }
+        
+    }
+
+    /* tps undo */
+    const tpsUndo = async () => {
+        if (!tpsMutex) {
+            toggleMutex(true);
+            const retval = await tps.undoTransaction();
+            await refetchAllSubregions();
+            toggleMutex(false);
+            return retval;
+        }
+    }
+    
     const goToAncestor = (entry) => {
         ancestors.splice(ancestors.indexOf(entry));
         console.log('newAncestors: ' + JSON.stringify(ancestors));
-        history.push({ pathname: `/home/sheet/${entry.id}`, state: { ancestors: ancestors }});
+        history.push({ pathname: `/home/sheet/${entry._id}`, state: { ancestors: ancestors }});
+    }
+
+    const goToSibling = (dir) => {
+        if (dir === 'left' && leftSibling) {
+            history.push({ pathname: `/home/view/${leftSibling._id}`, state: { ancestors: ancestors, siblings: siblings } });
+        } else if (dir === 'right' && rightSibling) {
+            history.push({ pathname: `/home/view/${rightSibling._id}`, state: { ancestors: ancestors, siblings: siblings } });
+        }
     }
 
     const handleLogout = async (e) => {
@@ -52,7 +132,7 @@ const RegionViewer = (props) => {
 
     return (
         props.user ? 
-        <WLayout WLayout='header' className='container-secondary'>
+        <WLayout wLayout='header' className='container-secondary'>
             <WLHeader>
                 <WNavbar color='colored'>
                     <ul className='toolbar-lside'>
@@ -67,6 +147,7 @@ const RegionViewer = (props) => {
                                     ancestors.map((entry, index) => (
                                         <WButton className='toolbar-path-entry' 
                                                  wType='texted'
+                                                 key={entry._id}
                                                  onClick={() => goToAncestor(entry)}>
                                             {index ? `> ${entry.name}` : `${entry.name}`}
                                         </WButton>
@@ -77,10 +158,16 @@ const RegionViewer = (props) => {
                         </div>
                     </ul>
                     <ul>
-                        <WButton className='arrow leftarrow' wType='texted'>
+                        <WButton className='arrow leftarrow' 
+                                 wType='texted'
+                                 disabled={!leftSibling}
+                                 onClick={() => goToSibling('left')}>
                             <i className='material-icons'>arrow_back</i>
                         </WButton>
-                        <WButton className='arrow rightarrow' wType='texted'>
+                        <WButton className='arrow rightarrow'
+                                 wType='texted'
+                                 disabled={!rightSibling}
+                                 onClick={() => goToSibling('right')}>
                             <i className='material-icons'>arrow_forward</i>
                         </WButton>
                     </ul>
@@ -106,7 +193,7 @@ const RegionViewer = (props) => {
                     <WRow><img src='/flag.jpg' alt='flag' width='200' height='200'></img></WRow>
                     <WRow>
                         <WCol size='6'>Region Name:</WCol>
-                        <WCol size='6'>{regionData.name}</WCol>
+                        <WCol size='6'>{region.name}</WCol>
                     </WRow>
                     <WRow>
                         <WCol size='6'>Parent Region: </WCol>
@@ -119,15 +206,15 @@ const RegionViewer = (props) => {
                     </WRow>
                     <WRow>
                         <WCol size='6'>Region Capital:</WCol>
-                        <WCol size='6'>{regionData.capital}</WCol>
+                        <WCol size='6'>{region.capital}</WCol>
                     </WRow>
                     <WRow>
                         <WCol size='6'>Region Leader:</WCol>
-                        <WCol size='6'>{regionData.leader}</WCol>
+                        <WCol size='6'>{region.leader}</WCol>
                     </WRow>
                     <WRow>
                         <WCol size='6'>Number of Subregions:</WCol>
-                        <WCol size='6'>{regionData.subregions ? regionData.subregions.length : 0}</WCol>
+                        <WCol size='6'>{allSubregions ? allSubregions.length : 0}</WCol>
                     </WRow>
                 </WLMain>
                 <WLMain className='viewer viewer-rside'>

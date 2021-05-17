@@ -151,7 +151,6 @@ const RegionSpreadSheet = (props) => {
     const goToSubregion = async (subregionId) => {
         ancestors.push({ _id: id, name: region.name });
         console.log('newAncestors: ' + JSON.stringify(ancestors));
-        // await refetchRegion({variables : { id: subregionId}});
         tps.clearAllTransactions();
         history.push({ pathname: `/home/sheet/${subregionId}`, state: { ancestors: ancestors }});
     }
@@ -159,8 +158,10 @@ const RegionSpreadSheet = (props) => {
     const goToRegionView = (regionId) => {
         ancestors.push({ _id: id, name: region.name });
         console.log('newAncestors: ' + JSON.stringify(ancestors));
-        history.push({ pathname: `/home/view/${regionId}`, state: { ancestors: ancestors } });
+        history.push({ pathname: `/home/view/${regionId}`, state: { ancestors: ancestors, siblings: subregions } });
     }
+
+    
 
     const handleLogout = async (e) => {
         // props.logout();
@@ -205,6 +206,7 @@ const RegionSpreadSheet = (props) => {
                                     ancestors.map((entry, index) => (
                                         <WButton className='toolbar-path-entry' 
                                                  wType='texted'
+                                                 key={entry._id}
                                                  onClick={() => goToAncestor(entry)}>
                                             {index ? `> ${entry.name}` : `${entry.name}`}
                                         </WButton>
