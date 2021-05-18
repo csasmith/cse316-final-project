@@ -24,6 +24,7 @@ const RegionViewer = (props) => {
 
     /* state hooks */
     const [input, setInput] = useState('');
+    const[editLandmarkName, toggleEdit] = useState('');
     const [tpsMutex, toggleMutex] = useState(false);
 
     /* misc hooks */
@@ -104,6 +105,7 @@ const RegionViewer = (props) => {
         if (!tpsMutex) {
             toggleMutex(true);
             const retval = await tps.undoTransaction();
+            console.log(retval);
             await refetch();
             toggleMutex(false);
             return retval;
@@ -121,12 +123,30 @@ const RegionViewer = (props) => {
             let newValue = region.landmarks.slice();
             newValue.push(input);
             newValue = newValue.join();
-            console.log(newValue);
+            console.log('newValue ' + newValue);
+            console.log('oldValue ' + oldValue);
             let transaction = new EditRegion_Transaction(id, 'landmarks', oldValue, newValue, SetRegionField);
             tps.addTransaction(transaction);
             setInput('');
             tpsRedo();
         }
+    }
+
+    const handleEditLandmark = async (e) => {
+        // const newName = e.currentTarget.value;
+        // if (newName) {
+        //     const oldName = editLandmarkName;
+        //     let newRegionLandmarks = region.landmarks.slice();
+        //     let oldNameIndex = newRegionLandmarks.indexOf(oldName);
+        //     newRegionLandmarks.splice(oldNameIndex, 1, newName);
+        //     let transaction = new EditRegion_Transaction(id, 'landmarks', region.landmarks, newRegionLandmarks, SetRegionField);
+        //     tps.addTransaction(transaction);
+        //     toggleEdit('');
+        //     tpsRedo();
+        // } else {
+        //     toggleEdit('');
+        // }
+
     }
     
     const goToAncestor = (entry) => {
@@ -156,9 +176,19 @@ const RegionViewer = (props) => {
         }
     }
 
+    const handleKeyDown = (e) => {
+        if (e.ctrlKey) {
+            if (e.keyCode === 90) {
+                tpsUndo();
+            } else if (e.keyCode === 89) {
+                tpsRedo();
+            }
+        }
+    }
+
     return (
         props.user ? 
-        <WLayout wLayout='header' className='container-secondary'>
+        <WLayout tabIndex='0' onKeyDown={handleKeyDown} wLayout='header' className='container-secondary'>
             <WLHeader>
                 <WNavbar color='colored'>
                     <ul className='toolbar-lside'>
@@ -213,8 +243,18 @@ const RegionViewer = (props) => {
                 <WLMain className='viewer viewer-lside'>
                     {/* Could maybe change first two to WLMain tags */}
                     <WRow>
-                        <WButton wType='texted' className='arrow'><i className='material-icons'>undo</i></WButton>
-                        <WButton wType='texted' className='arrow'><i className='material-icons'>redo</i></WButton>
+                        <WButton wType='texted' 
+                                 className='arrow'
+                                 disabled={!tps.hasTransactionToUndo()}
+                                 onClick={tps.hasTransactionToUndo() ? () => {} : tpsUndo}>
+                            <i className='material-icons'>undo</i>
+                        </WButton>
+                        <WButton wType='texted' 
+                                 className='arrow'
+                                 disabled={!tps.hasTransactionToRedo()}
+                                 onClick={tps.hasTransactionToRedo() ? () => {} : tpsRedo}>
+                            <i className='material-icons'>redo</i>
+                        </WButton>
                     </WRow>
                     <WRow><img src='/flag.jpg' alt='flag' width='200' height='200'></img></WRow>
                     <WRow>
@@ -258,12 +298,31 @@ const RegionViewer = (props) => {
                                 <WRow key={region._id + index} 
                                         className='landmark-row'>
                                     <WCol size='2'>
-                                        <WButton>
+                                        <WButton className='delete-table-entry-btn'
+                                                 wType='texted'>
                                             <i className='material-icons small'>close</i>
                                         </WButton>
                                     </WCol>
                                     <WCol size='10'>
-                                        {landmark}
+                                        {
+                                            editLandmarkName !== landmark ? 
+                                            <WButton wType='texted' className='landmark-entry'
+                                                     onClick={() => toggleEdit(landmark)}>
+                                                {landmark}
+                                            </WButton> 
+                                            :
+                                            <WInput wType='outlined'
+                                                    className='map-edit-name'
+                                                    inputType='text'
+                                                    name='landmark'
+                                                    placeholderText='Enter Landmark Name'
+                                                    barAnimation='left-to-right'
+                                                    labelAnimation='shrink'
+                                                    hoverAnimation='solid'
+                                                    autoFocus={true}
+                                                    onBlur={handleEditLandmark}
+                                            />
+                                        }
                                     </WCol>
                                 </WRow>
                             ))
@@ -278,10 +337,16 @@ const RegionViewer = (props) => {
                                     <WRow key={subregion._id + index} 
                                         className='landmark-row'>
                                         <WCol size='2'>
-
+                                            <WButton className='invisible-btn'
+                                                    wType='texted'>
+                                                <i className='material-icons small'>close</i>
+                                            </WButton>
                                         </WCol>
                                         <WCol size='10'>
-                                            {`${landmark} - ${subregion.name}`}
+                                            <WButton wType='texted' className='landmark-entry' disabled={false}
+                                                     onClick={() => {}}>
+                                                {`${landmark} - ${subregion.name}`}
+                                            </WButton> 
                                         </WCol>
                                     </WRow>
                                 ))

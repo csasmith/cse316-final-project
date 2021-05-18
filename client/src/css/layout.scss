@@ -253,3 +253,26 @@ html {
 .modal-header {
     text-align: center;
 }
+
+.landmarks-editor {
+    overflow-y:scroll
+}
+
+.landmark-row {
+    width: 100%;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.landmark-entry {
+    width:100%;
+    margin:0%;
+    padding: 0%;
+}
+
+.invisible-btn {
+    padding-left: 2px;
+    padding-right: 2px;
+    width: 10%;
+}

@@ -116,7 +116,7 @@ const RegionEntry = (props) => {
             <WCol className='table-col' size='4'>
                 <WButton wType='texted' className='table-link'
                          onClick={() => props.goToRegionView(props.subregion._id)}> 
-                    {props.subregion.landmarks} 
+                    {props.subregion.landmarks.join(', ')} 
                 </WButton>
             </WCol>
         </WRow>
