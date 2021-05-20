@@ -4,7 +4,8 @@ import { WModal, WMHeader, WMMain, WButton, WInput } from 'wt-frontend';
 const CreateMapModal = (props) => {
 
     // do index stuff in resolver
-    const [input, setInput] = useState({ _id: '', path: null, name: '', index: '' + props.mapsLength});
+
+    const [input, setInput] = useState({ _id: '', path: null, owner:'', name: '', capital:'None', leader:'None', landmarks: [], index: '' + props.mapsLength});
 
     const updateInput = (e) => {
         const { name, value } = e.target;
